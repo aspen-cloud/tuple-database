@@ -15,8 +15,8 @@
 		"removeComments": false,
 		"experimentalDecorators": true,
 		"jsx": "react",
-		"target": "es2018",
-		"lib": ["dom", "scripthost", "esnext.asynciterable"],
+		"target": "es2020",
+		"lib": ["dom", "scripthost", "esnext.asynciterable", "ES2020"],
 		"outDir": "build"
 	},
 	"include": ["src/**/*"],
