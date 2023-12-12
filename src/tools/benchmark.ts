@@ -112,6 +112,19 @@ async function asyncReadRemoveWriteBenchmark(
 	})
 }
 
+export function asyncWriteOnlyBenchmark(
+	label: string,
+	db: AsyncTupleDatabaseClientApi
+) {
+	return timeIt(label + ":writeOnly", async () => {
+		const tx = db.transact()
+		for (const i of range(iterations)) {
+			tx.set(randomTuple(), null)
+		}
+		await tx.commit()
+	})
+}
+
 async function asyncReadPerformanceBenchmark(
 	label: string,
 	db: AsyncTupleDatabaseClientApi
@@ -144,15 +157,22 @@ const tmpDir = path.resolve(__dirname, "../../tmp")
 async function main() {
 	await fs.mkdirp(tmpDir)
 
+	await asyncWriteOnlyBenchmark(
+		"AsyncTupleDatabase(InMemoryTupleStorage*))",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new InMemoryTupleStorage())
+		)
+	)
+
 	await asyncReadRemoveWriteBenchmark(
-		"AsyncTupleDatabase(InMemoryTupleStorage))",
+		"AsyncTupleDatabase(InMemoryTupleStorage*))",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(new InMemoryTupleStorage())
 		)
 	)
 
 	await asyncReadPerformanceBenchmark(
-		"AsyncTupleDatabase(InMemoryTupleStorage))",
+		"AsyncTupleDatabase(InMemoryTupleStorage*))",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(new InMemoryTupleStorage())
 		)
