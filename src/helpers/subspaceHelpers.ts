@@ -9,10 +9,12 @@ import {
 import { normalizeTupleBounds } from "./sortedTupleArray"
 
 export function prependPrefixToTuple(prefix: Tuple, tuple: Tuple): Tuple {
+	if (!prefix.length) return tuple
 	return [...prefix, ...tuple]
 }
 
 function prependPrefixToTuples(prefix: Tuple, tuples: Tuple[]): Tuple[] {
+	if (!prefix.length) return tuples
 	return tuples.map((tuple) => prependPrefixToTuple(prefix, tuple))
 }
 
@@ -20,6 +22,7 @@ function prependPrefixToTupleValuePair(
 	prefix: Tuple,
 	pair: KeyValuePair
 ): KeyValuePair {
+	if (!prefix.length) return pair
 	const { key, value } = pair
 	return {
 		key: prependPrefixToTuple(prefix, key),
@@ -31,6 +34,7 @@ function prependPrefixToTupleValuePairs(
 	prefix: Tuple,
 	pairs: KeyValuePair[]
 ): KeyValuePair[] {
+	if (!prefix.length) return pairs
 	return pairs.map((pair) => prependPrefixToTupleValuePair(prefix, pair))
 }
 
@@ -38,6 +42,7 @@ export function prependPrefixToWriteOps(
 	prefix: Tuple,
 	writes: WriteOps
 ): WriteOps {
+	if (!prefix.length) return writes
 	const set = writes.set
 		? prependPrefixToTupleValuePairs(prefix, writes.set)
 		: undefined
@@ -53,6 +58,7 @@ export function removePrefixFromWriteOps(
 	prefix: Tuple,
 	writes: WriteOps
 ): WriteOps {
+	if (!prefix.length) return writes
 	const set = writes.set
 		? removePrefixFromTupleValuePairs(prefix, writes.set)
 		: undefined
@@ -65,6 +71,7 @@ export function removePrefixFromWriteOps(
 }
 
 export function removePrefixFromTuple(prefix: Tuple, tuple: Tuple) {
+	if (!prefix.length) return tuple
 	if (!isEqual(tuple.slice(0, prefix.length), prefix)) {
 		throw new Error("Invalid prefix: " + JSON.stringify({ prefix, tuple }))
 	}
@@ -72,6 +79,7 @@ export function removePrefixFromTuple(prefix: Tuple, tuple: Tuple) {
 }
 
 function removePrefixFromTuples(prefix: Tuple, tuples: Tuple[]) {
+	if (!prefix.length) return tuples
 	return tuples.map((tuple) => removePrefixFromTuple(prefix, tuple))
 }
 
@@ -79,6 +87,7 @@ function removePrefixFromTupleValuePair(
 	prefix: Tuple,
 	pair: KeyValuePair
 ): KeyValuePair {
+	if (!prefix.length) return pair
 	const { key, value } = pair
 	return { key: removePrefixFromTuple(prefix, key), value }
 }
@@ -87,6 +96,7 @@ export function removePrefixFromTupleValuePairs(
 	prefix: Tuple,
 	pairs: KeyValuePair[]
 ): KeyValuePair[] {
+	if (!prefix.length) return pairs
 	return pairs.map((pair) => removePrefixFromTupleValuePair(prefix, pair))
 }
 
