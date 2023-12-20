@@ -1,56 +1,57 @@
 {
-  "name": "@triplit/tuple-database",
-  "version": "2.2.4",
-  "description": "An optimized fork of ccorcos/tuple-database",
-  "repository": "github:@triplit/tuple-database",
-  "main": "./main.js",
-  "scripts": {
-    "build": "run-s build:macros build:tsc",
-    "build:tsc": "tsc",
-    "build:macros": "ts-node src/tools/compileMacros.ts",
-    "watch": "tsc -w",
-    "test": "npm run test:clean && mocha -r ts-node/register './src/**/*.test.ts' --verbose",
-    "test:clean": "rm -rf tmp",
-    "test:watch": "npm test -- --watch --watch-extensions ts",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
-    "prettier": "prettier -w src",
-    "release": "./release.sh"
-  },
-  "devDependencies": {
-    "@types/better-sqlite3": "^7.6.3",
-    "@types/fs-extra": "^11.0.1",
-    "@types/level": "^6.0.1",
-    "@types/lodash": "^4.14.191",
-    "@types/mocha": "whitecolor/mocha-types",
-    "@types/node": "^18.11.18",
-    "@types/react": "^18.0.26",
-    "better-sqlite3": "^8.0.1",
-    "fake-indexeddb": "^4.0.1",
-    "idb": "^7.1.1",
-    "level": "^8.0.0",
-    "mocha": "^10.2.0",
-    "npm-run-all": "^4.1.5",
-    "organize-imports-cli": "^0.10.0",
-    "prettier": "^2.8.2",
-    "react": "^18.2.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
-  },
-  "peerDependencies": {
-    "react": "*"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    }
-  },
-  "dependencies": {
-    "elen": "^1.0.10",
-    "fractional-indexing": "^3.1.0",
-    "fs-extra": "^11.1.0",
-    "lodash": "^4.17.21",
-    "md5": "^2.3.0",
-    "uuid": "^9.0.0"
-  },
-  "license": "MIT"
+	"name": "@triplit/tuple-database",
+	"version": "2.2.4",
+	"description": "An optimized fork of ccorcos/tuple-database",
+	"repository": "github:@triplit/tuple-database",
+	"main": "./main.js",
+	"scripts": {
+		"build": "run-s build:macros build:tsc",
+		"build:tsc": "tsc",
+		"build:macros": "ts-node src/tools/compileMacros.ts",
+		"watch": "tsc -w",
+		"test": "npm run test:clean && mocha -r ts-node/register './src/**/*.test.ts' --verbose",
+		"test:clean": "rm -rf tmp",
+		"test:watch": "npm test -- --watch --watch-extensions ts",
+		"typecheck": "tsc --project tsconfig.json --noEmit",
+		"prettier": "prettier -w src",
+		"release": "./release.sh",
+		"pack": "./pack.sh"
+	},
+	"devDependencies": {
+		"@types/better-sqlite3": "^7.6.3",
+		"@types/fs-extra": "^11.0.1",
+		"@types/level": "^6.0.1",
+		"@types/lodash": "^4.14.191",
+		"@types/mocha": "whitecolor/mocha-types",
+		"@types/node": "^18.11.18",
+		"@types/react": "^18.0.26",
+		"better-sqlite3": "^8.0.1",
+		"fake-indexeddb": "^4.0.1",
+		"idb": "^7.1.1",
+		"level": "^8.0.0",
+		"mocha": "^10.2.0",
+		"npm-run-all": "^4.1.5",
+		"organize-imports-cli": "^0.10.0",
+		"prettier": "^2.8.2",
+		"react": "^18.2.0",
+		"ts-node": "^10.9.1",
+		"typescript": "^4.9.4"
+	},
+	"peerDependencies": {
+		"react": "*"
+	},
+	"peerDependenciesMeta": {
+		"react": {
+			"optional": true
+		}
+	},
+	"dependencies": {
+		"elen": "^1.0.10",
+		"fractional-indexing": "^3.1.0",
+		"fs-extra": "^11.1.0",
+		"lodash": "^4.17.21",
+		"md5": "^2.3.0",
+		"uuid": "^9.0.0"
+	},
+	"license": "MIT"
 }
