@@ -87,7 +87,8 @@ export class SQLiteTupleStorage implements TupleStorageApi {
 
 		const results = this.db.prepare(sqlQuery).all(sqlArgs)
 
-		return results.map(
+		return results.map<KeyValuePair>(
+			// @ts-ignore
 			({ key, value }) =>
 				({
 					key: decodeTuple(key) as Tuple,
