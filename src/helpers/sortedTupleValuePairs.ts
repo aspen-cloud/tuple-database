@@ -4,7 +4,7 @@ import { compareTuple } from "./compareTuple"
 import * as sortedList from "./sortedList"
 import { normalizeTupleBounds } from "./sortedTupleArray"
 
-function compareTupleValuePair(a: KeyValuePair, b: KeyValuePair) {
+export function compareTupleValuePair(a: KeyValuePair, b: KeyValuePair) {
 	return compareTuple(a.key, b.key)
 }
 

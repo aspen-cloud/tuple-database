@@ -9,8 +9,12 @@ type Identity<T> = T
 import { maybePromiseAll } from "../../helpers/maybeWaitForPromises"
 import * as SortedTuple from "../../helpers/sortedTupleArray"
 import { Bounds } from "../../helpers/sortedTupleArray"
-import * as SortedTupleValue from "../../helpers/sortedTupleValuePairs"
-import { ScanStorageArgs, WriteOps } from "../../storage/types"
+import {
+	KeyValuePair,
+	ScanStorageArgs,
+	Tuple,
+	WriteOps,
+} from "../../storage/types"
 import { TxId } from "../types"
 import { Callback } from "./types"
 
@@ -50,8 +54,19 @@ function getReactivityEmits(listenersDb: Listeners, writes: WriteOps) {
 	const emits: ReactivityEmits = new Map()
 
 	for (const [callback, bounds] of listenersDb) {
-		const matchingWrites = SortedTupleValue.scan(writes.set || [], bounds)
-		const matchingRemoves = SortedTuple.scan(writes.remove || [], bounds)
+		const matchingWrites: KeyValuePair[] = []
+		const matchingRemoves: Tuple[] = []
+		// Found it to be slightly faster to not assume this is sorted and check bounds individually instead of using scan(writes.set, bounds)
+		for (const kv of writes.set || []) {
+			if (SortedTuple.isTupleWithinBounds(kv.key, bounds)) {
+				matchingWrites.push(kv)
+			}
+		}
+		for (const tuple of writes.remove || []) {
+			if (SortedTuple.isTupleWithinBounds(tuple, bounds)) {
+				matchingRemoves.push(tuple)
+			}
+		}
 		if (matchingWrites.length > 0 || matchingRemoves.length > 0) {
 			emits.set(callback, { set: matchingWrites, remove: matchingRemoves })
 		}

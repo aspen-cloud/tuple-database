@@ -9,6 +9,7 @@ import {
 	removePrefixFromTupleValuePairs,
 	removePrefixFromWriteOps,
 } from "../../helpers/subspaceHelpers"
+import { compareTuple } from "../../main"
 import { KeyValuePair, Tuple, WriteOps } from "../../storage/types"
 import { TupleDatabaseApi } from "../sync/types"
 import {
@@ -129,6 +130,29 @@ export class AsyncTupleRootTransaction<S extends KeyValuePair>
 	canceled = false
 	writes: Required<WriteOps<S>>
 
+	// Track whether writes are dirty and need to be sorted prior to reading
+	private setsDirty = false
+	private removesDirty = false
+
+	private cleanWrites() {
+		this.cleanSets()
+		this.cleanRemoves()
+	}
+
+	private cleanSets() {
+		if (this.setsDirty) {
+			this.writes.set = this.writes.set.sort(tv.compareTupleValuePair)
+			this.setsDirty = false
+		}
+	}
+
+	private cleanRemoves() {
+		if (this.removesDirty) {
+			this.writes.remove = this.writes.remove.sort(compareTuple)
+			this.removesDirty = false
+		}
+	}
+
 	private checkActive() {
 		if (this.committed) throw new Error("Transaction already committed")
 		if (this.canceled) throw new Error("Transaction already canceled")
@@ -138,6 +162,7 @@ export class AsyncTupleRootTransaction<S extends KeyValuePair>
 		args: ScanArgs<T, P> = {}
 	): Promise<FilterTupleValuePairByPrefix<S, P>[]> {
 		this.checkActive()
+		this.cleanWrites()
 
 		const { limit: resultLimit, ...scanArgs } = normalizeSubspaceScanArgs(
 			this.subspacePrefix,
@@ -179,6 +204,7 @@ export class AsyncTupleRootTransaction<S extends KeyValuePair>
 		tuple: T
 	): Promise<ValueForTuple<S, T> | undefined> {
 		this.checkActive()
+		this.cleanWrites()
 		const fullTuple = prependPrefixToTuple(this.subspacePrefix, tuple)
 
 		if (tv.exists(this.writes.set, fullTuple)) {
@@ -200,6 +226,7 @@ export class AsyncTupleRootTransaction<S extends KeyValuePair>
 
 	async exists<T extends S["key"]>(tuple: T): Promise<boolean> {
 		this.checkActive()
+		this.cleanWrites()
 		const fullTuple = prependPrefixToTuple(this.subspacePrefix, tuple)
 
 		if (tv.exists(this.writes.set, fullTuple)) {
@@ -222,17 +249,21 @@ export class AsyncTupleRootTransaction<S extends KeyValuePair>
 		value: T["value"]
 	): AsyncTupleRootTransactionApi<S> {
 		this.checkActive()
+		this.cleanRemoves()
 		const fullTuple = prependPrefixToTuple(this.subspacePrefix, tuple)
 		t.remove(this.writes.remove, fullTuple)
-		tv.set(this.writes.set, fullTuple, value)
+		this.writes.set.push({ key: fullTuple, value: value } as S)
+		this.setsDirty = true
 		return this
 	}
 
 	remove(tuple: S["key"]): AsyncTupleRootTransactionApi<S> {
 		this.checkActive()
+		this.cleanSets()
 		const fullTuple = prependPrefixToTuple(this.subspacePrefix, tuple)
 		tv.remove(this.writes.set, fullTuple)
-		t.set(this.writes.remove, fullTuple)
+		this.writes.remove.push(fullTuple)
+		this.removesDirty = true
 		return this
 	}
 
