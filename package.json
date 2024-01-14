@@ -2,7 +2,7 @@
 	"name": "@triplit/tuple-database",
 	"version": "2.2.5",
 	"description": "An optimized fork of ccorcos/tuple-database",
-	"repository": "github:@triplit/tuple-database",
+	"repository": "github:aspen-cloud/tuple-database",
 	"main": "./main.js",
 	"scripts": {
 		"build": "run-s build:macros build:tsc",
