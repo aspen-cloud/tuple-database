@@ -17,7 +17,8 @@
 		"jsx": "react",
 		"target": "es2020",
 		"lib": ["dom", "scripthost", "esnext.asynciterable", "ES2020"],
-		"outDir": "build"
+		"outDir": "build",
+		"skipLibCheck": true
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules"]
