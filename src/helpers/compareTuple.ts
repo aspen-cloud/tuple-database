@@ -1,4 +1,4 @@
-import { isPlainObject } from "typechecker"
+import { isPlainObject } from "./isPlainObject"
 import { Tuple, Value } from "../storage/types"
 import { encodingRank, encodingTypeOf } from "./codec"
 import { compare } from "./compare"

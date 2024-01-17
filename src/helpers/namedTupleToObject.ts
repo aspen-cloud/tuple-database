@@ -1,4 +1,4 @@
-import { isPlainObject } from "typechecker"
+import { isPlainObject } from "./isPlainObject"
 import { Tuple, Value } from "../storage/types"
 
 // It is convenient to use named tuples when defining a schema so that you

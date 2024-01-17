@@ -2,7 +2,7 @@
 
 import * as elen from "elen"
 import { invert, sortBy } from "remeda"
-import { isPlainObject } from "typechecker"
+import { isPlainObject } from "./isPlainObject"
 import { Tuple, Value } from "../storage/types"
 import { compare } from "./compare"
 import { UnreachableError } from "./Unreachable"

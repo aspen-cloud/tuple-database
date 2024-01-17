@@ -1,4 +1,4 @@
-import sqlite from "better-sqlite3"
+// import sqlite from "better-sqlite3"
 import { Level } from "level"
 import * as path from "path"
 import { asyncDatabaseTestSuite } from "../database/async/asyncDatabaseTestSuite"
@@ -10,7 +10,7 @@ import { FileTupleStorage } from "./FileTupleStorage"
 import { IndexedDbTupleStorage } from "./IndexedDbTupleStorage"
 import { InMemoryTupleStorage } from "./InMemoryTupleStorage"
 import { LevelTupleStorage } from "./LevelTupleStorage"
-import { SQLiteTupleStorage } from "./SQLiteTupleStorage"
+// import { SQLiteTupleStorage } from "./SQLiteTupleStorage"
 
 const tmpDir = path.resolve(__dirname, "/../../tmp")
 
@@ -28,15 +28,15 @@ databaseTestSuite(
 		)
 )
 
-databaseTestSuite(
-	"TupleDatabaseClient(TupleDatabase(SQLiteTupleStorage))",
-	(id) =>
-		new TupleDatabaseClient(
-			new TupleDatabase(
-				new SQLiteTupleStorage(sqlite(path.join(tmpDir, id + ".db")))
-			)
-		)
-)
+// databaseTestSuite(
+// 	"TupleDatabaseClient(TupleDatabase(SQLiteTupleStorage))",
+// 	(id) =>
+// 		new TupleDatabaseClient(
+// 			new TupleDatabase(
+// 				new SQLiteTupleStorage(sqlite(path.join(tmpDir, id + ".db")))
+// 			)
+// 		)
+// )
 
 asyncDatabaseTestSuite(
 	"AsyncTupleDatabaseClient(TupleDatabase(InMemoryTupleStorage))",

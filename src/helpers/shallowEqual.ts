@@ -1,5 +1,5 @@
 import { intersection, isArray } from "remeda"
-import { isPlainObject } from "typechecker"
+import { isPlainObject } from "./isPlainObject"
 
 export function shallowEqual(a: any, b: any) {
 	if (a == b) return true
