@@ -7,9 +7,9 @@ This file is generated from async/asyncDatabaseTestSuite.ts
 type Identity<T> = T
 
 import { strict as assert } from "assert"
+import { describe, it } from "mocha"
 import * as _ from "remeda"
 import { sumBy } from "remeda"
-import { describe, it } from "mocha"
 import { randomId } from "../../helpers/randomId"
 import { KeyValuePair, MAX, MIN, WriteOps } from "../../storage/types"
 import { assertEqual } from "../../test/assertHelpers"
