@@ -23,49 +23,49 @@ const readIters = writeIters / readSize
 const tupleSize = 4
 
 function randomTuple() {
-	return range(tupleSize).map(() => Math.random())
+	return range(0, tupleSize).map(() => Math.random())
 }
 
 function randomObjectTuple() {
-	return range(tupleSize).map(() => ({ value: Math.random() }))
+	return range(0, tupleSize).map(() => ({ value: Math.random() }))
 }
 
 function randomArrayTuple() {
-	return range(tupleSize).map(() => [Math.random(), Math.random()])
+	return range(0, tupleSize).map(() => [Math.random(), Math.random()])
 }
 
 const initialDatabaseSize = 10000
 
 const seedReadRemoveWriteBench = transactionalReadWriteAsync()(async (tx) => {
-	for (const i of range(initialDatabaseSize)) {
+	for (const i of range(0, initialDatabaseSize)) {
 		tx.set(randomTuple(), null)
 	}
 })
 
 const readRemoveWrite = transactionalReadWriteAsync()(async (tx) => {
-	for (const i of range(readIters)) {
+	for (const i of range(0, readIters)) {
 		const results = await tx.scan({ gt: randomTuple(), limit: 10 })
 		for (const { key } of results) {
 			tx.remove(key)
 		}
 	}
-	for (const i of range(writeIters)) {
+	for (const i of range(0, writeIters)) {
 		tx.set(randomTuple(), null)
 	}
 })
 
 const seedReadPerformanceBench = transactionalReadWriteAsync()(async (tx) => {
 	// seed simple tuples
-	for (const i of range(initialDatabaseSize)) {
+	for (const i of range(0, initialDatabaseSize)) {
 		tx.set(["simpleTuple", ...randomTuple()], null)
 	}
 	// seed complex tuples
-	for (const i of range(initialDatabaseSize)) {
+	for (const i of range(0, initialDatabaseSize)) {
 		tx.set(["objectTuple", ...randomObjectTuple()], null)
 	}
 
 	// seed complex tuples
-	for (const i of range(initialDatabaseSize)) {
+	for (const i of range(0, initialDatabaseSize)) {
 		tx.set(["arrayTuple", ...randomArrayTuple()], null)
 	}
 })
@@ -106,7 +106,7 @@ async function asyncReadRemoveWriteBenchmark(
 	)
 
 	await timeIt(label + ":readRemoveWrite", async () => {
-		for (const i of range(iterations)) {
+		for (const i of range(0, iterations)) {
 			await readRemoveWrite(db)
 		}
 	})
@@ -118,7 +118,7 @@ export function asyncWriteOnlyBenchmark(
 ) {
 	return timeIt(label + ":writeOnly", async () => {
 		const tx = db.transact()
-		for (const i of range(iterations)) {
+		for (const i of range(0, iterations)) {
 			tx.set(randomTuple(), null)
 		}
 		await tx.commit()
@@ -134,19 +134,19 @@ async function asyncReadPerformanceBenchmark(
 	)
 
 	await timeIt(label + ":readSimpleTuples", async () => {
-		for (const i of range(iterations)) {
+		for (const i of range(0, iterations)) {
 			await readSimpleTuples(db)
 		}
 	})
 
 	await timeIt(label + ":readObjectTuples", async () => {
-		for (const i of range(iterations)) {
+		for (const i of range(0, iterations)) {
 			await readObjectTuples(db)
 		}
 	})
 
 	await timeIt(label + ":readArrayTuples", async () => {
-		for (const i of range(iterations)) {
+		for (const i of range(0, iterations)) {
 			await readArrayTuples(db)
 		}
 	})
@@ -178,14 +178,14 @@ async function main() {
 		)
 	)
 
-	await asyncReadRemoveWriteBenchmark(
-		"AsyncTupleDatabase(SQLiteTupleStorage))",
-		new AsyncTupleDatabaseClient(
-			new AsyncTupleDatabase(
-				new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
-			)
-		)
-	)
+	// await asyncReadRemoveWriteBenchmark(
+	// 	"AsyncTupleDatabase(SQLiteTupleStorage))",
+	// 	new AsyncTupleDatabaseClient(
+	// 		new AsyncTupleDatabase(
+	// 			new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
+	// 		)
+	// 	)
+	// )
 
 	await asyncReadRemoveWriteBenchmark(
 		"AsyncTupleDatabase(LevelTupleStorage))",
