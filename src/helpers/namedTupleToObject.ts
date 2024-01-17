@@ -1,4 +1,4 @@
-import { isPlainObject } from "lodash"
+import { isPlainObject } from "typechecker"
 import { Tuple, Value } from "../storage/types"
 
 // It is convenient to use named tuples when defining a schema so that you

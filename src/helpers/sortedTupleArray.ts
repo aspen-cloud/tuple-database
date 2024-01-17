@@ -1,4 +1,4 @@
-import { omitBy } from "lodash"
+import { omitBy } from "remeda"
 import { ScanArgs } from "../database/types"
 import { MAX, Tuple } from "../storage/types"
 import { compareTuple } from "./compareTuple"

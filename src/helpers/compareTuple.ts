@@ -1,4 +1,4 @@
-import { isPlainObject } from "lodash"
+import { isPlainObject } from "typechecker"
 import { Tuple, Value } from "../storage/types"
 import { encodingRank, encodingTypeOf } from "./codec"
 import { compare } from "./compare"

@@ -1,5 +1,5 @@
 import { strict as assert } from "assert"
-import * as _ from "lodash"
+import * as _ from "remeda"
 import { describe, it } from "mocha"
 import { KeyValuePair } from "../storage/types"
 import { get, remove, scan, set } from "./sortedTupleValuePairs"

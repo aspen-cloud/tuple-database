@@ -1,4 +1,4 @@
-import { chunk } from "lodash"
+import { chunk } from "remeda"
 import * as uuid from "uuid"
 import md5 from "md5"
 

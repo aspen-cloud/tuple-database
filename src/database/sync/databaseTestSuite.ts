@@ -7,8 +7,8 @@ This file is generated from async/asyncDatabaseTestSuite.ts
 type Identity<T> = T
 
 import { strict as assert } from "assert"
-import * as _ from "lodash"
-import { sum } from "lodash"
+import * as _ from "remeda"
+import { sumBy } from "remeda"
 import { describe, it } from "mocha"
 import { randomId } from "../../helpers/randomId"
 import { KeyValuePair, MAX, MIN, WriteOps } from "../../storage/types"
@@ -1277,7 +1277,7 @@ export function databaseTestSuite(
 
 						const resetTotal = () => {
 							const pairs = tx.scan({ prefix: ["player"] })
-							const total = sum(pairs.map(({ key }) => key[2]))
+							const total = sumBy(pairs, ({ key }) => key[2])
 							tx.remove(["total", getCurrentTotal()])
 							tx.set(["total", total], null)
 						}

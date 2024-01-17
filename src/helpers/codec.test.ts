@@ -1,11 +1,11 @@
 import { strict as assert } from "assert"
-import * as _ from "lodash"
 import { describe, it } from "mocha"
 import { Tuple } from "../storage/types"
 import { sortedValues } from "../test/fixtures"
 import { decodeTuple, decodeValue, encodeTuple, encodeValue } from "./codec"
 import { compare } from "./compare"
 import { TupleToString, ValueToString } from "./compareTuple"
+import { randomInt } from "./random"
 
 describe("codec", () => {
 	describe("encodeValue", () => {
@@ -120,9 +120,9 @@ describe("codec", () => {
 
 			const sample = () => {
 				const x = sortedValues.length
-				const i = _.random(x - 1)
-				const j = _.random(x - 1)
-				const k = _.random(x - 1)
+				const i = randomInt(x - 1)
+				const j = randomInt(x - 1)
+				const k = randomInt(x - 1)
 				const tuple: Tuple = [sortedValues[i], sortedValues[j], sortedValues[k]]
 				const rank = i * x * x + j * x + k
 				return { tuple, rank }
@@ -137,7 +137,3 @@ describe("codec", () => {
 		})
 	})
 })
-
-function not(x: number) {
-	return x === 0 ? x : -1 * x
-}

@@ -1,4 +1,5 @@
-import { intersection, isArray, isPlainObject } from "lodash"
+import { intersection, isArray } from "remeda"
+import { isPlainObject } from "typechecker"
 
 export function shallowEqual(a: any, b: any) {
 	if (a == b) return true

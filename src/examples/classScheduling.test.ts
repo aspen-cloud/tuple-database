@@ -2,7 +2,7 @@
 // https://apple.github.io/foundationdb/class-scheduling.html
 
 import { strict as assert } from "assert"
-import { flatten, range } from "lodash"
+import { flatten, range } from "remeda"
 import { describe, it } from "mocha"
 import { transactionalReadWrite } from "../database/sync/transactionalReadWrite"
 import { ReadOnlyTupleDatabaseClientApi } from "../database/sync/types"

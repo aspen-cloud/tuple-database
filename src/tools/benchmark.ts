@@ -7,7 +7,7 @@
 import sqlite from "better-sqlite3"
 import * as fs from "fs-extra"
 import { Level } from "level"
-import { range } from "lodash"
+import { range } from "remeda"
 import * as path from "path"
 import { AsyncTupleDatabase } from "../database/async/AsyncTupleDatabase"
 import { AsyncTupleDatabaseClientApi } from "../database/async/asyncTypes"

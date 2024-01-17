@@ -1,6 +1,5 @@
 import { strict as assert } from "assert"
-import * as _ from "lodash"
-import { shuffle } from "lodash"
+import { shuffle } from "remeda"
 import { describe, it } from "mocha"
 import { Tuple } from "../storage/types"
 import { sortedValues } from "../test/fixtures"
@@ -10,6 +9,7 @@ import {
 	TupleToString,
 	ValueToString,
 } from "./compareTuple"
+import { randomInt } from "./random"
 
 describe("compareValue", () => {
 	it("sorting is correct", () => {
@@ -89,9 +89,9 @@ describe("compareTuple", () => {
 	it("3-length tuple sorting is correct (sampled)", () => {
 		const sample = () => {
 			const x = sortedValues.length
-			const i = _.random(x - 1)
-			const j = _.random(x - 1)
-			const k = _.random(x - 1)
+			const i = randomInt(x - 1)
+			const j = randomInt(x - 1)
+			const k = randomInt(x - 1)
 			const tuple: Tuple = [sortedValues[i], sortedValues[j], sortedValues[k]]
 			const rank = i * x * x + j * x + k
 			return { tuple, rank }

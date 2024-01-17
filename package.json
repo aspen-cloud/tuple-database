@@ -49,8 +49,9 @@
 		"elen": "^1.0.10",
 		"fractional-indexing": "^3.1.0",
 		"fs-extra": "^11.1.0",
-		"lodash": "^4.17.21",
 		"md5": "^2.3.0",
+		"remeda": "^1.37.0",
+		"typechecker": "^9.3.0",
 		"uuid": "^9.0.0"
 	},
 	"license": "MIT"

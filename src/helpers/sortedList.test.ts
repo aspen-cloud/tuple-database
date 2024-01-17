@@ -1,5 +1,5 @@
 import { strict as assert } from "assert"
-import * as _ from "lodash"
+import * as _ from "remeda"
 import { describe, it } from "mocha"
 import { compare } from "./compare"
 import { remove, scan, set } from "./sortedList"
