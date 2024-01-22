@@ -28,7 +28,7 @@
 1. Install from NPM:
 
 	```sh
-	npm install tuple-database
+	npm install @triplit/tuple-database
 	```
 
 2. Define your schema.

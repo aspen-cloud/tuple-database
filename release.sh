@@ -9,5 +9,5 @@ cp .npmignore build
 cp README.md build
 
 cd build
-npm publish
+npm publish --access=public
 cd ..
