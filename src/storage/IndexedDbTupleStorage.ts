@@ -20,7 +20,7 @@ export class IndexedDbTupleStorage implements AsyncTupleStorageApi {
 
 	async scan(args?: ScanStorageArgs) {
 		const db = await this.db
-		const tx = db.transaction(storeName, "readonly")
+		const tx = db.transaction(storeName, "readonly", { durability: "relaxed" })
 		const index = tx.store // primary key
 
 		const lower = args?.gt || args?.gte
@@ -67,7 +67,7 @@ export class IndexedDbTupleStorage implements AsyncTupleStorageApi {
 
 	async commit(writes: WriteOps) {
 		const db = await this.db
-		const tx = db.transaction(storeName, "readwrite")
+		const tx = db.transaction(storeName, "readwrite", { durability: "relaxed" })
 		for (const { key, value } of writes.set || []) {
 			tx.store.put(value, encodeTuple(key))
 		}
