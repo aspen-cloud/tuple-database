@@ -10,6 +10,8 @@ import { FileTupleStorage } from "./FileTupleStorage"
 import { IndexedDbTupleStorage } from "./IndexedDbTupleStorage"
 import { InMemoryTupleStorage } from "./InMemoryTupleStorage"
 import { LevelTupleStorage } from "./LevelTupleStorage"
+import { CachedIndexedDbStorage } from "./IndexedDbWithMemoryCacheTupleStorage"
+import { MemoryBTreeStorage } from "./MemoryBTreeTupleStorage"
 // import { SQLiteTupleStorage } from "./SQLiteTupleStorage"
 
 const tmpDir = path.resolve(__dirname, "/../../tmp")
@@ -55,6 +57,15 @@ asyncDatabaseTestSuite(
 )
 
 asyncDatabaseTestSuite(
+	"AsyncTupleDatabaseClient(AsyncTupleDatabase(MemoryBTreeTupleStorage))",
+	() =>
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new MemoryBTreeStorage())
+		),
+	false
+)
+
+asyncDatabaseTestSuite(
 	"AsyncTupleDatabaseClient(AsyncTupleDatabase(LevelTupleStorage))",
 	(id) =>
 		new AsyncTupleDatabaseClient(
@@ -71,6 +82,14 @@ asyncDatabaseTestSuite(
 	(id) =>
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(new IndexedDbTupleStorage(id))
+		),
+	true
+)
+asyncDatabaseTestSuite(
+	"AsyncTupleDatabaseClient(AsyncTupleDatabase(CachedIndexedDbTupleStorage))",
+	(id) =>
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new CachedIndexedDbStorage(id))
 		),
 	true
 )
