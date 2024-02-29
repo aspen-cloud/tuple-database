@@ -14,7 +14,7 @@ export class ReadWriteConflictError extends Error {
 		const message = outdent(`
       ReadWriteConflictError: ${txId}
       Write to tuple ${writeTuple}
-      conflicted with a read at the bounds ${readBounds}
+      conflicted with a read at the bounds ${JSON.stringify(readBounds)}
     `)
 
 		super(message)
