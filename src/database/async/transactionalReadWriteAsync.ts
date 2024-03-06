@@ -3,7 +3,7 @@ import {
 	AsyncTupleDatabaseClientApi,
 	AsyncTupleTransactionApi,
 } from "./asyncTypes"
-import { retryAsync } from "./retryAsync"
+import { RetryOptions, retryAsync } from "./retryAsync"
 
 // Similar to FoundationDb's abstraction: https://apple.github.io/foundationdb/class-scheduling.html
 // Accepts a transaction or a database and allows you to compose transactions together.
@@ -13,7 +13,7 @@ import { retryAsync } from "./retryAsync"
 // https://stackoverflow.com/questions/60377365/typescript-infer-type-of-generic-after-optional-first-generic
 export function transactionalReadWriteAsync<
 	S extends KeyValuePair = KeyValuePair
->(retries = 5) {
+>(retries = 5, options: RetryOptions = {}) {
 	return function <I extends any[], O>(
 		fn: (tx: AsyncTupleTransactionApi<S>, ...args: I) => Promise<O>
 	) {
@@ -22,12 +22,16 @@ export function transactionalReadWriteAsync<
 			...args: I
 		): Promise<O> {
 			if (!("transact" in dbOrTx)) return fn(dbOrTx, ...args)
-			return await retryAsync(retries, async () => {
-				const tx = dbOrTx.transact()
-				const result = await fn(tx, ...args)
-				await tx.commit()
-				return result
-			})
+			return await retryAsync(
+				retries,
+				async () => {
+					const tx = dbOrTx.transact()
+					const result = await fn(tx, ...args)
+					await tx.commit()
+					return result
+				},
+				options
+			)
 		}
 	}
 }
