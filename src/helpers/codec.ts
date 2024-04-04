@@ -19,10 +19,11 @@ export const encodingByte = {
 
 export type EncodingType = keyof typeof encodingByte
 
-export const encodingRank = sortBy(
-	Object.entries(encodingByte),
-	([key, value]) => value
-).map(([key]) => key as EncodingType)
+export const encodingRank = new Map<EncodingType, number>(
+	sortBy(Object.entries(encodingByte), ([key, value]) => value).map(
+		([key], i) => [key as EncodingType, i]
+	)
+)
 
 export function encodeValue(value: Value): string {
 	if (value === null) {

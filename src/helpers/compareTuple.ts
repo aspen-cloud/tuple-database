@@ -45,7 +45,7 @@ export function compareValue(a: Value, b: Value): number {
 		}
 	}
 
-	return compare(encodingRank.indexOf(at), encodingRank.indexOf(bt))
+	return compare(encodingRank.get(at)!, encodingRank.get(bt)!)
 }
 
 function compareObject(
