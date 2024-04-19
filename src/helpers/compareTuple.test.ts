@@ -1,6 +1,5 @@
-import { strict as assert } from "assert"
 import { shuffle } from "remeda"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { Tuple } from "../storage/types"
 import { sortedValues } from "../test/fixtures"
 import {
@@ -15,13 +14,8 @@ describe("compareValue", () => {
 	it("sorting is correct", () => {
 		for (let i = 0; i < sortedValues.length; i++) {
 			for (let j = 0; j < sortedValues.length; j++) {
-				assert.equal(
-					compareValue(sortedValues[i], sortedValues[j]),
-					compareValue(i, j),
-					`compare(${[
-						ValueToString(sortedValues[i]),
-						ValueToString(sortedValues[j]),
-					].join(",")})`
+				expect(compareValue(sortedValues[i], sortedValues[j])).toBe(
+					compareValue(i, j)
 				)
 			}
 		}
@@ -38,28 +32,24 @@ describe("compareValue", () => {
 			new A(),
 		]).sort(compareValue)
 
-		assert.deepEqual(values[0], { a: 1 })
-		assert.deepEqual(values[1], { a: 2 })
-		assert.deepEqual(values[2], { b: -1 })
-		assert.ok(values[3] instanceof A)
-		assert.ok(values[4] instanceof A)
+		expect(values[0]).toEqual({ a: 1 })
+		expect(values[1]).toEqual({ a: 2 })
+		expect(values[2]).toEqual({ b: -1 })
+		expect(values[3] instanceof A).toBeTruthy()
+		expect(values[4] instanceof A).toBeTruthy()
 	})
 
 	it("Compares object equality", () => {
 		class A {}
 		const a = new A()
-		assert.equal(compareValue(a, a), 0)
+		expect(compareValue(a, a)).toBe(0)
 	})
 })
 
 describe("compareTuple", () => {
 	it("Sorting works for pairs in-order.", () => {
 		const test = (a: Tuple, b: Tuple, value: number) => {
-			assert.equal(
-				compareTuple(a, b),
-				value,
-				`compare(${[TupleToString(a), TupleToString(b)].join(", ")})`
-			)
+			expect(compareTuple(a, b)).toBe(value)
 		}
 
 		// Ensure it works for all pairwise tuples.
@@ -76,11 +66,7 @@ describe("compareTuple", () => {
 
 	it("Sorting does a true deep-compare", () => {
 		const test = (a: Tuple, b: Tuple, value: number) => {
-			assert.equal(
-				compareTuple(a, b),
-				value,
-				`compare(${[TupleToString(a), TupleToString(b)].join(", ")})`
-			)
+			expect(compareTuple(a, b)).toBe(value)
 		}
 
 		test(["a", { a: { b: "c" } }], ["a", { a: { b: "c" } }], 0)
@@ -101,13 +87,7 @@ describe("compareTuple", () => {
 		for (let iter = 0; iter < 100_000; iter++) {
 			const a = sample()
 			const b = sample()
-			assert.equal(
-				compareTuple(a.tuple, b.tuple),
-				compareValue(a.rank, b.rank),
-				`compare(${[TupleToString(a.tuple), TupleToString(b.tuple)].join(
-					", "
-				)})`
-			)
+			expect(compareTuple(a.tuple, b.tuple)).toBe(compareValue(a.rank, b.rank))
 		}
 	})
 })

@@ -1,5 +1,4 @@
-import assert from "assert"
-import { describe, test } from "mocha"
+import { describe, test, expect } from "bun:test"
 import { outdent } from "./outdent"
 
 describe("outdent", () => {
@@ -14,7 +13,7 @@ describe("outdent", () => {
 Write to tuple
 conflicted with a read at the bounds`
 
-		assert.strictEqual(actual, expected)
+		expect(actual).toStrictEqual(expected)
 	})
 
 	test("only trims the minimum indent across all the lines", () => {
@@ -29,6 +28,6 @@ conflicted with a read at the bounds`
     Write to tuple
     conflicted with a read at the bounds`
 
-		assert.strictEqual(actual, expected)
+		expect(actual).toStrictEqual(expected)
 	})
 })

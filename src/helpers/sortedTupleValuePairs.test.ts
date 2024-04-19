@@ -1,6 +1,5 @@
-import { strict as assert } from "assert"
 import * as _ from "remeda"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { KeyValuePair } from "../storage/types"
 import { get, remove, scan, set } from "./sortedTupleValuePairs"
 
@@ -20,13 +19,13 @@ describe("sortedTupleValuePairs", () => {
 		for (const { key, value } of _.shuffle(items)) {
 			set(data, key, value)
 		}
-		assert.deepEqual(data, items)
+		expect(data).toEqual(items)
 	})
 
 	it("set will replace a value", () => {
 		const data = [...items]
 		set(data, ["b"], 99)
-		assert.deepEqual(data, [
+		expect(data).toEqual([
 			{ key: [], value: 0 },
 			{ key: ["a"], value: 1 },
 			{ key: ["a", "a"], value: 2 },
@@ -40,7 +39,7 @@ describe("sortedTupleValuePairs", () => {
 	it("remove", () => {
 		const data = [...items]
 		remove(data, ["b"])
-		assert.deepEqual(data, [
+		expect(data).toEqual([
 			{ key: [], value: 0 },
 			{ key: ["a"], value: 1 },
 			{ key: ["a", "a"], value: 2 },
@@ -53,14 +52,14 @@ describe("sortedTupleValuePairs", () => {
 	it("get", () => {
 		const data = [...items]
 		const result = get(data, ["b"])
-		assert.deepEqual(result, 4)
+		expect(result).toEqual(4)
 	})
 
 	// NOTE: this logic is well tested in sortedList.test.ts and sortedTupleArray.test.ts
 	// This is just a smoke test because there is some stuff going on with the bounds adjustment.
 	it("scan prefix", () => {
 		const result = scan(items, { prefix: ["a"] })
-		assert.deepEqual(result, [
+		expect(result).toEqual([
 			{ key: ["a"], value: 1 },
 			{ key: ["a", "a"], value: 2 },
 			{ key: ["a", "b"], value: 3 },
@@ -69,7 +68,7 @@ describe("sortedTupleValuePairs", () => {
 
 	it("scan gt", () => {
 		const result = scan(items, { gt: ["a", "a"] })
-		assert.deepEqual(result, [
+		expect(result).toEqual([
 			{ key: ["a", "b"], value: 3 },
 			{ key: ["b"], value: 4 },
 			{ key: ["b", "a"], value: 5 },
@@ -84,7 +83,7 @@ describe("sortedTupleValuePairs", () => {
 		for (const { key, value } of _.shuffle(items)) {
 			set(data, key, value, true)
 		}
-		assert.deepEqual(data, reversed)
+		expect(data).toEqual(reversed)
 	})
 
 	it("remove reverse", () => {
@@ -96,7 +95,7 @@ describe("sortedTupleValuePairs", () => {
 			set(data, [3], null, true)
 
 			remove(data, [1], true)
-			assert.deepEqual(data, [
+			expect(data).toEqual([
 				{ key: [3], value: null },
 				{ key: [2], value: null },
 			])
@@ -110,7 +109,7 @@ describe("sortedTupleValuePairs", () => {
 			set(data, [3], null, true)
 
 			remove(data, [2], true)
-			assert.deepEqual(data, [
+			expect(data).toEqual([
 				{ key: [3], value: null },
 				{ key: [1], value: null },
 			])
@@ -124,7 +123,7 @@ describe("sortedTupleValuePairs", () => {
 			set(data, [3], null, true)
 
 			remove(data, [1], true)
-			assert.deepEqual(data, [
+			expect(data).toEqual([
 				{ key: [3], value: null },
 				{ key: [2], value: null },
 			])

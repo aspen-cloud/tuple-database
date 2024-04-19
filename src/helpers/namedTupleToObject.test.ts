@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { Assert } from "../database/typeHelpers"
 import { namedTupleToObject } from "./namedTupleToObject"
 
@@ -12,6 +11,6 @@ describe("namedTupleToObject", () => {
 		]
 		const obj = namedTupleToObject(tuple)
 		type X = Assert<typeof obj, { a: 1; b: string[] }>
-		assert.deepEqual(obj, { a: 1, b: ["c"] })
+		expect(obj).toEqual({ a: 1, b: ["c"] })
 	})
 })

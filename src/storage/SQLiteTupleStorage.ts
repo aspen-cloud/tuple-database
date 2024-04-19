@@ -1,4 +1,4 @@
-import { Database, Transaction } from "better-sqlite3"
+import type { Database, Transaction } from "better-sqlite3"
 import { TupleStorageApi } from "../database/sync/types"
 import { decodeTuple, encodeTuple } from "../helpers/codec"
 import { KeyValuePair, ScanStorageArgs, Tuple, WriteOps } from "./types"

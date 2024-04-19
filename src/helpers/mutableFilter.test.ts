@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { mutableFilter } from "./mutableFilter"
 
 describe("mutableFilter", () => {
@@ -12,6 +11,6 @@ describe("mutableFilter", () => {
 		const immutableResult = immutable.filter(fn)
 		mutableFilter(mutable, fn)
 
-		assert.deepEqual(immutableResult, mutable)
+		expect(immutableResult).toEqual(mutable)
 	})
 })

@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { invertString } from "./invertString"
 
 type ParseTest = [string, number]
@@ -77,15 +76,15 @@ describe("parseNumber", () => {
 
 	it("can encode and decode properly", () => {
 		for (const str of data) {
-			assert.strictEqual(invertString(invertString(str)), str)
+			expect(invertString(invertString(str))).toStrictEqual(str)
 		}
 	})
 
 	it("inversion is reverse sorted", () => {
 		const sorted = [...data].sort()
-		assert.deepStrictEqual(sorted, data)
+		expect(sorted).toStrictEqual(data)
 
 		const inverseSorted = sorted.map(invertString).sort().map(invertString)
-		assert.deepStrictEqual(inverseSorted, sorted.reverse())
+		expect(inverseSorted).toStrictEqual(sorted.reverse())
 	})
 })

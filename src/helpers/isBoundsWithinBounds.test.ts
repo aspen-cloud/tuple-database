@@ -1,23 +1,15 @@
-import { describe, it } from "mocha"
-import { assert } from "../test/assertHelpers"
+import { describe, it, expect } from "bun:test"
+// import { assert } from "../test/assertHelpers"
 import { isBoundsWithinBounds } from "./isBoundsWithinBounds"
 import { Bounds } from "./sortedTupleArray"
 
 const testWithinBounds = (container: Bounds) => ({
-	true: (bounds: Bounds) =>
-		assert.equal(
-			isBoundsWithinBounds({ container, bounds }),
-			true,
-			`${JSON.stringify(container)} should contain ${JSON.stringify(bounds)}`
-		),
-	false: (bounds: Bounds) =>
-		assert.equal(
-			isBoundsWithinBounds({ container, bounds }),
-			false,
-			`${JSON.stringify(container)} should NOT contain ${JSON.stringify(
-				bounds
-			)}`
-		),
+	true: (bounds: Bounds) => {
+		expect(isBoundsWithinBounds({ container, bounds })).toBeTrue()
+	},
+	false: (bounds: Bounds) => {
+		expect(isBoundsWithinBounds({ container, bounds })).toBeFalse()
+	},
 })
 
 describe("isBoundsWithinBounds", () => {

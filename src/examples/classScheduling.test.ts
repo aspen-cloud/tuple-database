@@ -1,9 +1,8 @@
 // Based on the FoundationDb tutorial:
 // https://apple.github.io/foundationdb/class-scheduling.html
 
-import { strict as assert } from "assert"
 import { flatten, range } from "remeda"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { transactionalReadWrite } from "../database/sync/transactionalReadWrite"
 import { ReadOnlyTupleDatabaseClientApi } from "../database/sync/types"
 import { SchemaSubspace } from "../database/typeHelpers"
@@ -149,70 +148,70 @@ describe("Class Scheduling Example", () => {
 		const db = createStorage()
 		init(db)
 
-		assert.equal(getClasses(db, student1).length, 0)
+		expect(getClasses(db, student1).length).toBe(0)
 		signup(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 1)
+		expect(getClasses(db, student1).length).toBe(1)
 	})
 
 	it("signup - already signed up", () => {
 		const db = createStorage()
 		init(db)
 
-		assert.equal(getClasses(db, student1).length, 0)
+		expect(getClasses(db, student1).length).toBe(0)
 		signup(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 1)
+		expect(getClasses(db, student1).length).toBe(1)
 		signup(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 1)
+		expect(getClasses(db, student1).length).toBe(1)
 	})
 
 	it("signup more than one", () => {
 		const db = createStorage()
 		init(db)
 
-		assert.equal(getClasses(db, student1).length, 0)
-		assert.equal(getClasses(db, student2).length, 0)
+		expect(getClasses(db, student1).length).toBe(0)
+		expect(getClasses(db, student2).length).toBe(0)
 
 		const course = db.subspace(["class"])
 
-		assert.equal(course.get([class1]), 4)
-		assert.equal(course.get([class2]), 4)
+		expect(course.get([class1])).toBe(4)
+		expect(course.get([class2])).toBe(4)
 
 		signup(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 1)
-		assert.equal(course.get([class1]), 3)
+		expect(getClasses(db, student1).length).toBe(1)
+		expect(course.get([class1])).toBe(3)
 
 		signup(db, student1, class2)
-		assert.equal(getClasses(db, student1).length, 2)
-		assert.equal(course.get([class2]), 3)
+		expect(getClasses(db, student1).length).toBe(2)
+		expect(course.get([class2])).toBe(3)
 
 		signup(db, student2, class2)
 
-		assert.equal(getClasses(db, student1).length, 2)
-		assert.equal(getClasses(db, student2).length, 1)
+		expect(getClasses(db, student1).length).toBe(2)
+		expect(getClasses(db, student2).length).toBe(1)
 
-		assert.equal(course.get([class2]), 2)
+		expect(course.get([class2])).toBe(2)
 	})
 
 	it("drop", () => {
 		const db = createStorage()
 		init(db)
 
-		assert.equal(getClasses(db, student1).length, 0)
+		expect(getClasses(db, student1).length).toBe(0)
 		signup(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 1)
+		expect(getClasses(db, student1).length).toBe(1)
 		drop(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 0)
+		expect(getClasses(db, student1).length).toBe(0)
 	})
 
 	it("drop - not taking this class", () => {
 		const db = createStorage()
 		init(db)
 
-		assert.equal(getClasses(db, student1).length, 0)
+		expect(getClasses(db, student1).length).toBe(0)
 		signup(db, student1, class1)
-		assert.equal(getClasses(db, student1).length, 1)
+		expect(getClasses(db, student1).length).toBe(1)
 		drop(db, student1, class2)
-		assert.equal(getClasses(db, student1).length, 1)
+		expect(getClasses(db, student1).length).toBe(1)
 	})
 
 	it("signup - max attendance", () => {
@@ -226,8 +225,8 @@ describe("Class Scheduling Example", () => {
 
 		const course = db.subspace(["class"])
 
-		assert.equal(course.get([class1]), 0)
-		assert.throws(() => signup(db, student5, class1))
+		expect(course.get([class1])).toBe(0)
+		expect(() => signup(db, student5, class1)).toThrow()
 	})
 
 	it("signup - too many classes", () => {
@@ -240,9 +239,9 @@ describe("Class Scheduling Example", () => {
 		signup(db, student1, class4)
 		signup(db, student1, class5)
 
-		assert.equal(getClasses(db, student1).length, 5)
+		expect(getClasses(db, student1).length).toBe(5)
 
-		assert.throws(() => signup(db, student1, class6))
+		expect(() => signup(db, student1, class6)).toThrow()
 	})
 
 	it("switchClasses", () => {
@@ -255,26 +254,26 @@ describe("Class Scheduling Example", () => {
 		signup(db, student1, class4)
 		signup(db, student1, class5)
 
-		assert.equal(getClasses(db, student1).length, 5)
+		expect(getClasses(db, student1).length).toBe(5)
 
 		switchClasses(db, student1, { old: class5, new: class6 })
 		const classes = getClasses(db, student1)
-		assert.equal(classes.length, 5)
-		assert.ok(classes.includes(class6))
-		assert.ok(!classes.includes(class5))
+		expect(classes.length).toBe(5)
+		expect(classes.includes(class6)).toBeTruthy()
+		expect(!classes.includes(class5)).toBeTruthy()
 	})
 
 	it("availableClasses", () => {
 		const db = createStorage()
 		init(db)
 
-		assert.ok(availableClasses(db).includes(class1))
+		expect(availableClasses(db).includes(class1)).toBeTruthy()
 
 		signup(db, student1, class1)
 		signup(db, student2, class1)
 		signup(db, student3, class1)
 		signup(db, student4, class1)
 
-		assert.ok(!availableClasses(db).includes(class1))
+		expect(!availableClasses(db).includes(class1)).toBeTruthy()
 	})
 })

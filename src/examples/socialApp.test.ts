@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { transactionalReadWrite } from "../database/sync/transactionalReadWrite"
 import { TupleDatabase } from "../database/sync/TupleDatabase"
 import { TupleDatabaseClient } from "../database/sync/TupleDatabaseClient"
@@ -127,17 +126,17 @@ describe("Social App", () => {
 			text: "post2",
 		})
 
-		assert.deepEqual(getProfile(db, "chet"), ["post1"])
-		assert.deepEqual(getProfile(db, "meghan"), ["post2"])
+		expect(getProfile(db, "chet")).toEqual(["post1"])
+		expect(getProfile(db, "meghan")).toEqual(["post2"])
 
-		assert.deepEqual(getFeed(db, "chet"), [])
-		assert.deepEqual(getFeed(db, "meghan"), [])
+		expect(getFeed(db, "chet")).toEqual([])
+		expect(getFeed(db, "meghan")).toEqual([])
 
 		// When meghan follows chet, the post should appear in her feed.
 		addFollow(db, "meghan", "chet")
 
-		assert.deepEqual(getFeed(db, "chet"), [])
-		assert.deepEqual(getFeed(db, "meghan"), ["post1"])
+		expect(getFeed(db, "chet")).toEqual([])
+		expect(getFeed(db, "meghan")).toEqual(["post1"])
 
 		// When chet makes another post, it should show up in meghan's feed.
 		createPost(db, {
@@ -147,7 +146,7 @@ describe("Social App", () => {
 			text: "post3",
 		})
 
-		assert.deepEqual(getProfile(db, "chet"), ["post1", "post3"])
-		assert.deepEqual(getFeed(db, "meghan"), ["post1", "post3"])
+		expect(getProfile(db, "chet")).toEqual(["post1", "post3"])
+		expect(getFeed(db, "meghan")).toEqual(["post1", "post3"])
 	})
 })

@@ -1,6 +1,5 @@
-import { strict as assert } from "assert"
 import * as _ from "remeda"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { MAX, MIN, Tuple } from "../storage/types"
 import {
 	getPrefixContainingBounds,
@@ -28,32 +27,32 @@ describe("sortedTupleArray", () => {
 			for (const item of _.shuffle(items)) {
 				set(data, item)
 			}
-			assert.deepEqual(data, items)
+			expect(data).toEqual(items)
 		})
 
 		it("prefix", () => {
 			const result = scan(items, { prefix: ["a"] })
-			assert.deepEqual(result, [["a"], ["a", "a"], ["a", "b"]])
+			expect(result).toEqual([["a"], ["a", "a"], ["a", "b"]])
 		})
 
 		it("prefix limit", () => {
 			const result = scan(items, { prefix: ["a"], limit: 2 })
-			assert.deepEqual(result, [["a"], ["a", "a"]])
+			expect(result).toEqual([["a"], ["a", "a"]])
 		})
 
 		it("prefix limit truncated", () => {
 			const result = scan(items, { prefix: ["a"], limit: 10 })
-			assert.deepEqual(result, [["a"], ["a", "a"], ["a", "b"]])
+			expect(result).toEqual([["a"], ["a", "a"], ["a", "b"]])
 		})
 
 		it("prefix reverse", () => {
 			const result = scan(items, { prefix: ["a"], reverse: true })
-			assert.deepEqual(result, [["a", "b"], ["a", "a"], ["a"]])
+			expect(result).toEqual([["a", "b"], ["a", "a"], ["a"]])
 		})
 
 		it("prefix reverse limit", () => {
 			const result = scan(items, { prefix: ["a"], limit: 2, reverse: true })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "b"],
 				["a", "a"],
 			])
@@ -61,7 +60,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix reverse limit truncated", () => {
 			const result = scan(items, { prefix: ["a"], limit: 10, reverse: true })
-			assert.deepEqual(result, [["a", "b"], ["a", "a"], ["a"]])
+			expect(result).toEqual([["a", "b"], ["a", "a"], ["a"]])
 		})
 	})
 
@@ -89,7 +88,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gt", () => {
 			const result = scan(items, { prefix: ["a"], gt: ["a", MAX] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "b", "a"],
 				["a", "b", "b"],
 				["a", "b", "c"],
@@ -105,8 +104,7 @@ describe("sortedTupleArray", () => {
 				gt: ["a", MAX],
 				reverse: true,
 			})
-			assert.deepEqual(
-				result,
+			expect(result).toEqual(
 				[
 					["a", "b", "a"],
 					["a", "b", "b"],
@@ -120,7 +118,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix lt", () => {
 			const result = scan(items, { prefix: ["a"], lt: ["b"] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "a", "a"],
 				["a", "a", "b"],
 				["a", "a", "c"],
@@ -129,8 +127,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix lt reverse", () => {
 			const result = scan(items, { prefix: ["a"], lt: ["b"], reverse: true })
-			assert.deepEqual(
-				result,
+			expect(result).toEqual(
 				[
 					["a", "a", "a"],
 					["a", "a", "b"],
@@ -141,7 +138,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gt/lt", () => {
 			const result = scan(items, { prefix: ["a"], gt: ["a", MAX], lt: ["c"] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "b", "a"],
 				["a", "b", "b"],
 				["a", "b", "c"],
@@ -155,8 +152,7 @@ describe("sortedTupleArray", () => {
 				lt: ["c"],
 				reverse: true,
 			})
-			assert.deepEqual(
-				result,
+			expect(result).toEqual(
 				[
 					["a", "b", "a"],
 					["a", "b", "b"],
@@ -167,7 +163,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gte", () => {
 			const result = scan(items, { prefix: ["a"], gte: ["b"] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "b", "a"],
 				["a", "b", "b"],
 				["a", "b", "c"],
@@ -179,8 +175,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gte reverse", () => {
 			const result = scan(items, { prefix: ["a"], gte: ["b"], reverse: true })
-			assert.deepEqual(
-				result,
+			expect(result).toEqual(
 				[
 					["a", "b", "a"],
 					["a", "b", "b"],
@@ -194,7 +189,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix lte", () => {
 			const result = scan(items, { prefix: ["a"], lte: ["a", MAX] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "a", "a"],
 				["a", "a", "b"],
 				["a", "a", "c"],
@@ -207,8 +202,7 @@ describe("sortedTupleArray", () => {
 				lte: ["a", MAX],
 				reverse: true,
 			})
-			assert.deepEqual(
-				result,
+			expect(result).toEqual(
 				[
 					["a", "a", "a"],
 					["a", "a", "b"],
@@ -219,7 +213,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gte/lte", () => {
 			const result = scan(items, { prefix: ["a"], gte: ["b"], lte: ["c", MAX] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "b", "a"],
 				["a", "b", "b"],
 				["a", "b", "c"],
@@ -236,8 +230,7 @@ describe("sortedTupleArray", () => {
 				lte: ["c", MAX],
 				reverse: true,
 			})
-			assert.deepEqual(
-				result,
+			expect(result).toEqual(
 				[
 					["a", "b", "a"],
 					["a", "b", "b"],
@@ -265,7 +258,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gt MIN", () => {
 			const result = scan(items, { prefix: ["a"], gt: [MIN] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "a"],
 				["a", "b"],
 				["a", "c"],
@@ -274,7 +267,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gt MIN reverse", () => {
 			const result = scan(items, { prefix: ["a"], gt: [MIN], reverse: true })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "c"],
 				["a", "b"],
 				["a", "a"],
@@ -283,7 +276,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gt", () => {
 			const result = scan(items, { prefix: ["a"], gt: ["a"] })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "b"],
 				["a", "c"],
 			])
@@ -291,7 +284,7 @@ describe("sortedTupleArray", () => {
 
 		it("prefix gt reverse", () => {
 			const result = scan(items, { prefix: ["a"], gt: ["a"], reverse: true })
-			assert.deepEqual(result, [
+			expect(result).toEqual([
 				["a", "c"],
 				["a", "b"],
 			])
@@ -299,35 +292,35 @@ describe("sortedTupleArray", () => {
 
 		it("prefix lt MAX", () => {
 			const result = scan(items, { prefix: ["a"], lt: [MAX] })
-			assert.deepEqual(result, [["a"], ["a", "a"], ["a", "b"], ["a", "c"]])
+			expect(result).toEqual([["a"], ["a", "a"], ["a", "b"], ["a", "c"]])
 		})
 
 		it("prefix lt MAX reverse", () => {
 			const result = scan(items, { prefix: ["a"], lt: [MAX], reverse: true })
-			assert.deepEqual(result, [["a", "c"], ["a", "b"], ["a", "a"], ["a"]])
+			expect(result).toEqual([["a", "c"], ["a", "b"], ["a", "a"], ["a"]])
 		})
 
 		it("prefix lt", () => {
 			const result = scan(items, { prefix: ["a"], lt: ["c"] })
-			assert.deepEqual(result, [["a"], ["a", "a"], ["a", "b"]])
+			expect(result).toEqual([["a"], ["a", "a"], ["a", "b"]])
 		})
 
 		it("prefix lt reverse", () => {
 			const result = scan(items, { prefix: ["a"], lt: ["c"], reverse: true })
-			assert.deepEqual(result, [["a", "b"], ["a", "a"], ["a"]])
+			expect(result).toEqual([["a", "b"], ["a", "a"], ["a"]])
 		})
 	})
 
 	describe("normalizeTupleBounds", () => {
 		it("normalized prefix", () => {
-			assert.deepEqual(normalizeTupleBounds({ prefix: ["a"] }), {
+			expect(normalizeTupleBounds({ prefix: ["a"] })).toEqual({
 				gte: ["a"], // NOTE: this is not ["a", MIN]
 				lte: ["a", ...MaxTuple],
 			})
 		})
 
 		it("prepends prefix to constraints", () => {
-			assert.deepEqual(normalizeTupleBounds({ prefix: ["a"], gte: ["b"] }), {
+			expect(normalizeTupleBounds({ prefix: ["a"], gte: ["b"] })).toEqual({
 				gte: ["a", "b"],
 				lte: ["a", ...MaxTuple],
 			})
@@ -336,47 +329,39 @@ describe("sortedTupleArray", () => {
 
 	describe("prefixTupleBounds", () => {
 		it("Computes trivial bounds prefix", () => {
-			assert.deepEqual(
-				getPrefixContainingBounds({ gte: ["a", 1], lte: ["a", 10] }),
-				["a"]
-			)
+			expect(
+				getPrefixContainingBounds({ gte: ["a", 1], lte: ["a", 10] })
+			).toEqual(["a"])
 		})
 
 		it("Handles entirely disjoint tuples", () => {
-			assert.deepEqual(
-				getPrefixContainingBounds({ gte: ["a", 1], lte: ["b", 10] }),
-				[]
-			)
+			expect(
+				getPrefixContainingBounds({ gte: ["a", 1], lte: ["b", 10] })
+			).toEqual([])
 		})
 	})
 
 	describe("isTupleWithinBounds", () => {
 		it("Works for exact equality range", () => {
-			assert.deepEqual(
-				isTupleWithinBounds(["a"], { gte: ["a"], lte: ["a"] }),
+			expect(isTupleWithinBounds(["a"], { gte: ["a"], lte: ["a"] })).toEqual(
 				true
 			)
-			assert.deepEqual(
-				isTupleWithinBounds(["a", 1], { gte: ["a"], lte: ["a"] }),
+			expect(isTupleWithinBounds(["a", 1], { gte: ["a"], lte: ["a"] })).toEqual(
 				false
 			)
 		})
 
 		it("Works for non-trivial range", () => {
-			assert.deepEqual(
-				isTupleWithinBounds(["a"], { gt: ["a"], lte: ["b"] }),
+			expect(isTupleWithinBounds(["a"], { gt: ["a"], lte: ["b"] })).toEqual(
 				false
 			)
-			assert.deepEqual(
-				isTupleWithinBounds(["a", 1], { gt: ["a"], lte: ["b"] }),
+			expect(isTupleWithinBounds(["a", 1], { gt: ["a"], lte: ["b"] })).toEqual(
 				true
 			)
-			assert.deepEqual(
-				isTupleWithinBounds(["b"], { gt: ["a"], lte: ["b"] }),
+			expect(isTupleWithinBounds(["b"], { gt: ["a"], lte: ["b"] })).toEqual(
 				true
 			)
-			assert.deepEqual(
-				isTupleWithinBounds(["b", 1], { gt: ["a"], lte: ["b"] }),
+			expect(isTupleWithinBounds(["b", 1], { gt: ["a"], lte: ["b"] })).toEqual(
 				false
 			)
 		})

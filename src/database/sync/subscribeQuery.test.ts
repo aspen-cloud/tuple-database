@@ -1,6 +1,5 @@
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { InMemoryTupleStorage } from "../../main"
-import { assertEqual } from "../../test/assertHelpers"
 import { subscribeQuery } from "./subscribeQuery"
 import { TupleDatabase } from "./TupleDatabase"
 import { TupleDatabaseClient } from "./TupleDatabaseClient"
@@ -24,17 +23,17 @@ describe("subscribeQuery", () => {
 		const { result, destroy } = subscribeQuery(
 			db,
 			(db) => db.get(["a"]),
-			(result) => {
+			(result: number) => {
 				aResult = result
 			}
 		)
 
-		assertEqual(aResult, undefined)
-		assertEqual(result, 0)
+		expect(aResult).toEqual(undefined)
+		expect(result).toEqual(0)
 
 		setA(1)
 
-		assertEqual(aResult, 1)
+		expect(aResult as unknown).toEqual(1)
 
 		destroy()
 	})
@@ -90,8 +89,8 @@ describe("subscribeQuery", () => {
 		focusedFile = focusedFileQuery.result
 		subscribeToFocusedFile(focusedFile)
 
-		assertEqual(focusedFile, 1)
-		assertEqual(focusedFileValue, "file 1 value")
+		expect(focusedFile).toEqual(1)
+		expect(focusedFileValue as unknown).toEqual("file 1 value")
 
 		const tx = db.transact()
 		tx.remove(["filesById", 1])
@@ -99,7 +98,7 @@ describe("subscribeQuery", () => {
 		tx.set(["focusedFileId"], 2)
 		tx.commit()
 
-		assertEqual(focusedFile, 2)
-		assertEqual(focusedFileValue, "file 2 value")
+		expect(focusedFile).toEqual(2)
+		expect(focusedFileValue as unknown).toEqual("file 2 value")
 	})
 })

@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { Queue } from "./Queue"
 
 describe("Queue", () => {
@@ -9,10 +8,10 @@ describe("Queue", () => {
 		const items: any[] = []
 
 		q.enqueue(() => items.push(1))
-		assert.deepEqual(items, [1])
+		expect(items).toEqual([1])
 
 		q.enqueue(() => items.push(2))
-		assert.deepEqual(items, [1, 2])
+		expect(items).toEqual([1, 2])
 	})
 
 	it("evaluates asynchronously", async () => {
@@ -32,15 +31,15 @@ describe("Queue", () => {
 			items.push(2)
 		})
 
-		assert.deepEqual(items, [])
+		expect(items).toEqual([])
 
 		d1.resolve()
 		await q1
-		assert.deepEqual(items, [1])
+		expect(items).toEqual([1])
 
 		d2.resolve()
 		await q2
-		assert.deepEqual(items, [1, 2])
+		expect(items).toEqual([1, 2])
 	})
 })
 

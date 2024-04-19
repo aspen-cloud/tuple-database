@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { Tuple } from "../storage/types"
 import { sortedValues } from "../test/fixtures"
 import { decodeTuple, decodeValue, encodeTuple, encodeValue } from "./codec"
@@ -15,15 +14,7 @@ describe("codec", () => {
 				const encoded = encodeValue(value)
 				const decoded = decodeValue(encoded)
 
-				assert.deepStrictEqual(
-					decoded,
-					value,
-					[
-						ValueToString(value),
-						ValueToString(encoded),
-						ValueToString(decoded),
-					].join(" -> ")
-				)
+				expect(decoded).toStrictEqual(value)
 			}
 		})
 
@@ -32,17 +23,7 @@ describe("codec", () => {
 				for (let j = 0; j < sortedValues.length; j++) {
 					const a = encodeValue(sortedValues[i])
 					const b = encodeValue(sortedValues[j])
-					assert.deepStrictEqual(
-						compare(a, b),
-						compare(i, j),
-						`compareValue(${[
-							ValueToString(sortedValues[i]),
-							ValueToString(sortedValues[j]),
-						].join(", ")}) === compare(${[
-							JSON.stringify(a),
-							JSON.stringify(b),
-						].join(", ")})`
-					)
+					expect(compare(a, b)).toStrictEqual(compare(i, j))
 				}
 			}
 		})
@@ -53,15 +34,7 @@ describe("codec", () => {
 			const test = (tuple: Tuple) => {
 				const encoded = encodeTuple(tuple)
 				const decoded = decodeTuple(encoded)
-				assert.deepStrictEqual(
-					decoded,
-					tuple,
-					[
-						TupleToString(tuple),
-						ValueToString(encoded),
-						TupleToString(decoded),
-					].join(" -> ")
-				)
+				expect(decoded).toStrictEqual(tuple)
 			}
 			test([])
 			for (let i = 0; i < sortedValues.length; i++) {
@@ -89,13 +62,7 @@ describe("codec", () => {
 			const test = (aTuple: Tuple, bTuple: Tuple, result: number) => {
 				const a = encodeTuple(aTuple)
 				const b = encodeTuple(bTuple)
-				assert.deepStrictEqual(
-					compare(a, b),
-					result,
-					`compareTuple(${[TupleToString(aTuple), TupleToString(bTuple)].join(
-						", "
-					)}) === compare(${[JSON.stringify(a), JSON.stringify(b)].join(", ")})`
-				)
+				expect(compare(a, b)).toStrictEqual(result)
 			}
 
 			for (let i = 0; i < sortedValues.length; i++) {

@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { normalizeTupleBounds } from "../helpers/sortedTupleArray"
 import { Tuple } from "../storage/types"
 import { ConcurrencyLog } from "./ConcurrencyLog"
@@ -13,23 +12,23 @@ describe("ConcurrencyLog", () => {
 		const log = new ConcurrencyLog()
 
 		log.write("tx1", [1])
-		assert.deepEqual(log.log, [])
+		expect(log.log).toEqual([])
 
 		log.read("tx2", bounds([2]))
 
 		log.write("tx3", [2])
 		log.write("tx3", [3])
 
-		assert.deepEqual(log.log, [
+		expect(log.log).toEqual([
 			{ type: "read", txId: "tx2", bounds: bounds([2]) },
 			{ type: "write", txId: "tx3", tuple: [2] },
 		])
 
-		assert.throws(() => log.commit("tx2"))
-		assert.deepEqual(log.log, [])
+		expect(() => log.commit("tx2")).toThrow()
+		expect(log.log).toEqual([])
 	})
 
-	it.skip("Keeps writes that conflict with reads of other transactions.")
+	it.todo("Keeps writes that conflict with reads of other transactions.")
 
-	it.skip("Can cancel a transaction to clean up the log.")
+	it.todo("Can cancel a transaction to clean up the log.")
 })

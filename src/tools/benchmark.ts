@@ -15,6 +15,8 @@ import { transactionalReadWriteAsync } from "../database/async/transactionalRead
 import { AsyncTupleDatabaseClient, InMemoryTupleStorage } from "../main"
 import { LevelTupleStorage } from "../storage/LevelTupleStorage"
 import { SQLiteTupleStorage } from "../storage/SQLiteTupleStorage"
+import * as LMDB from "lmdb"
+import { LMDBTupleStorage } from "../storage/LMDBTupleStorage"
 
 const iterations = 1000
 const writeIters = 100
@@ -34,10 +36,10 @@ function randomArrayTuple() {
 	return range(0, tupleSize).map(() => [Math.random(), Math.random()])
 }
 
-const initialDatabaseSize = 10000
+const NUM_TUPLES = 10000
 
 const seedReadRemoveWriteBench = transactionalReadWriteAsync()(async (tx) => {
-	for (const i of range(0, initialDatabaseSize)) {
+	for (const i of range(0, NUM_TUPLES)) {
 		tx.set(randomTuple(), null)
 	}
 })
@@ -56,16 +58,16 @@ const readRemoveWrite = transactionalReadWriteAsync()(async (tx) => {
 
 const seedReadPerformanceBench = transactionalReadWriteAsync()(async (tx) => {
 	// seed simple tuples
-	for (const i of range(0, initialDatabaseSize)) {
+	for (const i of range(0, NUM_TUPLES)) {
 		tx.set(["simpleTuple", ...randomTuple()], null)
 	}
 	// seed complex tuples
-	for (const i of range(0, initialDatabaseSize)) {
+	for (const i of range(0, NUM_TUPLES)) {
 		tx.set(["objectTuple", ...randomObjectTuple()], null)
 	}
 
 	// seed complex tuples
-	for (const i of range(0, initialDatabaseSize)) {
+	for (const i of range(0, NUM_TUPLES)) {
 		tx.set(["arrayTuple", ...randomArrayTuple()], null)
 	}
 })
@@ -158,20 +160,41 @@ async function main() {
 	await fs.mkdirp(tmpDir)
 
 	await asyncWriteOnlyBenchmark(
-		"AsyncTupleDatabase(InMemoryTupleStorage*))",
+		"Memory",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new InMemoryTupleStorage())
+		)
+	)
+	await asyncReadPerformanceBenchmark(
+		"Memory",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(new InMemoryTupleStorage())
 		)
 	)
 
-	await asyncReadRemoveWriteBenchmark(
-		"AsyncTupleDatabase(InMemoryTupleStorage*))",
+	await asyncWriteOnlyBenchmark(
+		"LMDB",
 		new AsyncTupleDatabaseClient(
-			new AsyncTupleDatabase(new InMemoryTupleStorage())
+			new AsyncTupleDatabase(
+				new LMDBTupleStorage(
+					LMDB.open(path.join(tmpDir, "benchmark-lmdb-write.db"), {})
+				)
+			)
 		)
 	)
 
 	await asyncReadPerformanceBenchmark(
+		"LMDB",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(
+				new LMDBTupleStorage(
+					LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), {})
+				)
+			)
+		)
+	)
+
+	await asyncReadRemoveWriteBenchmark(
 		"AsyncTupleDatabase(InMemoryTupleStorage*))",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(new InMemoryTupleStorage())
@@ -197,6 +220,36 @@ async function main() {
 			)
 		)
 	)
+
+	await asyncReadRemoveWriteBenchmark(
+		"AsyncTupleDatabase(LMDBTupleStorage))",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(
+				new LMDBTupleStorage(
+					LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), {})
+				)
+			)
+		)
+	)
+
+	// await asyncReadPerformanceBenchmark(
+	// 	"READ(SQLite)",
+	// 	new AsyncTupleDatabaseClient(
+	// 		new AsyncTupleDatabase(
+	// 			new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
+	// 		)
+	// 	)
+	// )
+	// await asyncReadPerformanceBenchmark(
+	// 	"READ(Level)",
+	// 	new AsyncTupleDatabaseClient(
+	// 		new AsyncTupleDatabase(
+	// 			new LevelTupleStorage(
+	// 				new Level(path.join(tmpDir, "benchmark-level.db"))
+	// 			)
+	// 		)
+	// 	)
+	// )
 }
 
 main()

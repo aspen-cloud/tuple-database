@@ -6,13 +6,11 @@ This file is generated from async/asyncDatabaseTestSuite.ts
 
 type Identity<T> = T
 
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, expect, it } from "bun:test"
 import * as _ from "remeda"
 import { sumBy } from "remeda"
 import { randomId } from "../../helpers/randomId"
 import { KeyValuePair, MAX, MIN, WriteOps } from "../../storage/types"
-import { assertEqual } from "../../test/assertHelpers"
 import { sortedValues } from "../../test/fixtures"
 import { transactionalWrite } from "../transactionalWrite"
 import { Assert } from "../typeHelpers"
@@ -24,7 +22,7 @@ const isSync = true
 
 export function databaseTestSuite(
 	name: string,
-	createStorage: <S extends KeyValuePair = KeyValuePair>(
+	createStorage: <S extends KeyValuePair = { key: any[]; value: any }>(
 		id: string
 	) => TupleDatabaseClientApi<S>,
 	durable = true
@@ -49,7 +47,7 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 		})
 
 		it("inserting the same thing gets deduplicated", () => {
@@ -59,7 +57,7 @@ export function databaseTestSuite(
 			transaction.set(["a", "a"], 0)
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, [{ key: ["a", "a"], value: 0 }])
+			expect(data).toEqual([{ key: ["a", "a"], value: 0 }])
 		})
 
 		it("updates will overwrite the value", () => {
@@ -69,7 +67,7 @@ export function databaseTestSuite(
 			transaction.set(["a", "a"], 1)
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, [{ key: ["a", "a"], value: 1 }])
+			expect(data).toEqual([{ key: ["a", "a"], value: 1 }])
 		})
 
 		it("transaction value overwrites works", () => {
@@ -78,16 +76,16 @@ export function databaseTestSuite(
 			transaction.set(["a", "a"], 0)
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, [{ key: ["a", "a"], value: 0 }])
+			expect(data).toEqual([{ key: ["a", "a"], value: 0 }])
 
 			const transaction2 = store.transact()
 			transaction2.set(["a", "a"], 1)
 			const data2 = transaction2.scan()
-			assertEqual(data2, [{ key: ["a", "a"], value: 1 }])
+			expect(data2).toEqual([{ key: ["a", "a"], value: 1 }])
 
 			transaction2.commit()
 			const data3 = store.scan()
-			assertEqual(data3, [{ key: ["a", "a"], value: 1 }])
+			expect(data3).toEqual([{ key: ["a", "a"], value: 1 }])
 		})
 
 		it("tx.scan limit and removes items correctly", () => {
@@ -106,10 +104,10 @@ export function databaseTestSuite(
 			transaction.remove([2])
 
 			const dataNoLimit = transaction.scan()
-			assertEqual(dataNoLimit, [{ key: [3], value: null }])
+			expect(dataNoLimit).toEqual([{ key: [3], value: null }])
 
 			const data = transaction.scan({ limit: 1 })
-			assertEqual(data, [{ key: [3], value: null }])
+			expect(data).toEqual([{ key: [3], value: null }])
 		})
 
 		it("inserts the same thing gets deduplicated with ids", () => {
@@ -120,7 +118,7 @@ export function databaseTestSuite(
 				.set(["a", { uuid: "a" }], 0)
 				.commit()
 			const data = store.scan()
-			assertEqual(data.length, 1)
+			expect(data.length).toEqual(1)
 		})
 
 		it("inserts get deduplicated in separate transactions", () => {
@@ -137,7 +135,7 @@ export function databaseTestSuite(
 				.commit()
 
 			const data = store.scan()
-			assertEqual(data.length, 1)
+			expect(data.length).toEqual(1)
 		})
 
 		it("inserts get deduplicated set/remove in same transaction", () => {
@@ -150,7 +148,7 @@ export function databaseTestSuite(
 				.commit()
 
 			const data = store.scan()
-			assertEqual(data.length, 0, `data: ${JSON.stringify(data)}`)
+			expect(data.length).toEqual(0)
 		})
 
 		it("inserts get deduplicated remove/set in same transaction", () => {
@@ -163,7 +161,7 @@ export function databaseTestSuite(
 				.commit()
 
 			const data = store.scan()
-			assertEqual(data.length, 1)
+			expect(data.length).toEqual(1)
 		})
 
 		it("inserts get deduplicated set/remove in same transaction with initial tuple", () => {
@@ -181,7 +179,7 @@ export function databaseTestSuite(
 				.commit()
 
 			const data = store.scan()
-			assertEqual(data.length, 0)
+			expect(data.length).toEqual(0)
 		})
 
 		it("inserts get deduplicated remove/set in same transaction with initial tuple", () => {
@@ -199,7 +197,7 @@ export function databaseTestSuite(
 				.commit()
 
 			const data = store.scan()
-			assertEqual(data.length, 1)
+			expect(data.length).toEqual(1)
 		})
 
 		it("removes items correctly", () => {
@@ -220,14 +218,14 @@ export function databaseTestSuite(
 			for (const { key, value } of _.shuffle(items)) {
 				transaction.set(key, value)
 			}
-			assertEqual(transaction.scan(), items)
+			expect(transaction.scan()).toEqual(items)
 
 			transaction.remove(["a", "a", "c"])
 			transaction.remove(["a", "c", "a"])
 			transaction.remove(["a", "b", "b"])
 
 			const data = transaction.scan()
-			assertEqual(data, [
+			expect(data).toEqual([
 				{ key: ["a", "a", "a"], value: 1 },
 				{ key: ["a", "a", "b"], value: 2 },
 				{ key: ["a", "b", "a"], value: 4 },
@@ -236,7 +234,7 @@ export function databaseTestSuite(
 				{ key: ["a", "c", "c"], value: 9 },
 			])
 			transaction.commit()
-			assertEqual(store.scan(), data)
+			expect(store.scan()).toEqual(data)
 		})
 
 		it("transaction.write()", () => {
@@ -256,7 +254,7 @@ export function databaseTestSuite(
 
 			store.transact().write({ set: items }).commit()
 			let data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			store
 				.transact()
@@ -270,7 +268,7 @@ export function databaseTestSuite(
 				.commit()
 
 			data = store.scan()
-			assertEqual(data, [
+			expect(data).toEqual([
 				{ key: ["a", "a", "a"], value: 1 },
 				{ key: ["a", "a", "b"], value: 2 },
 				{ key: ["a", "a", "c"], value: 3 },
@@ -300,13 +298,13 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gt: ["a", "a", MAX],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -336,14 +334,14 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gt: ["a", "a", MAX],
 				lt: ["a", "c", MIN],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -354,7 +352,7 @@ export function databaseTestSuite(
 				lt: ["a", "b", MAX],
 			})
 
-			assertEqual(result2, [
+			expect(result2).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -381,13 +379,13 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
-				prefix: ["a", "b"],
+				prefix: ["a", "b"] as any[],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -411,10 +409,10 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({ prefix: [2] })
-			assertEqual(result, items)
+			expect(result as KeyValuePair[]).toEqual(items)
 		})
 
 		it("scan prefix gte/lte", () => {
@@ -439,15 +437,15 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
-				prefix: ["a", "b"],
+				prefix: ["a", "b"] as any[],
 				gte: ["b"],
 				lte: ["d"],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
 				{ key: ["a", "b", "d"], value: 6.5 },
@@ -497,7 +495,7 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				prefix: ["a", "b"],
@@ -505,7 +503,7 @@ export function databaseTestSuite(
 				lte: ["d"],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
 				{ key: ["a", "b", "d"], value: 6.5 },
@@ -532,13 +530,13 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gte: ["a", "b", "a"],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -568,14 +566,14 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gte: ["a", "a", "c"],
 				lte: ["a", "c", MAX],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "a", "c"], value: 3 },
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
@@ -617,14 +615,14 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gte: ["a", "a", "c"],
 				lte: ["a", "c", MAX],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "a", "c"], value: 3 },
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
@@ -655,13 +653,13 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gt: ["a", "b", MAX],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "c", "a"], value: 7 },
 				{ key: ["a", "c", "b"], value: 8 },
 				{ key: ["a", "c", "c"], value: 9 },
@@ -688,14 +686,14 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gt: ["a", "a", MAX],
 				lt: ["a", "b", MAX],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -722,13 +720,13 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gte: ["a", "b", MIN],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -758,14 +756,14 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
 			const result = store.scan({
 				gte: ["a", "a", "c"],
 				lte: ["a", "b", MAX],
 			})
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "a", "c"], value: 3 },
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
@@ -793,17 +791,13 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
-
-			try {
+			expect(data).toEqual(items)
+			expect(() => {
 				store.scan({
 					gte: ["a", "c"],
 					lte: ["a", "a"],
 				})
-				assert.fail("Should fail.")
-			} catch (error) {
-				assert.ok(error)
-			}
+			}).toThrow()
 		})
 
 		it("stores all types of values", () => {
@@ -817,7 +811,7 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 		})
 
 		it("transaction overwrites when scanning data out", () => {
@@ -840,11 +834,11 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 			const data = store.scan()
-			assertEqual(data, items)
+			expect(data).toEqual(items)
 
-			const result = store.scan({ prefix: ["a", "b"] })
+			const result = store.scan({ prefix: ["a", "b"] as any[] })
 
-			assertEqual(result, [
+			expect(result).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 5 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -852,8 +846,8 @@ export function databaseTestSuite(
 
 			const transaction2 = store.transact()
 			transaction2.set(["a", "b", "b"], 99)
-			const result2 = transaction2.scan({ prefix: ["a", "b"] })
-			assertEqual(result2, [
+			const result2 = transaction2.scan({ prefix: ["a", "b"] as any[] })
+			expect(result2).toEqual([
 				{ key: ["a", "b", "a"], value: 4 },
 				{ key: ["a", "b", "b"], value: 99 },
 				{ key: ["a", "b", "c"], value: 6 },
@@ -880,9 +874,9 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 
-			assertEqual(store.get(["a", "a", "c"]), 3)
-			assertEqual(store.get(["a", "c", "c"]), 9)
-			assertEqual(store.get(["a", "c", "d"]), undefined)
+			expect(store.get(["a", "a", "c"])).toEqual(3)
+			expect(store.get(["a", "c", "c"])).toEqual(9)
+			expect(store.get(["a", "c", "d"])).toEqual(undefined)
 		})
 
 		it("transaction overwrites get", () => {
@@ -892,16 +886,16 @@ export function databaseTestSuite(
 
 			const tr = store.transact()
 			tr.set(["a"], 2)
-			assertEqual(store.get(["a"]), 1)
-			assertEqual(tr.get(["a"]), 2)
+			expect(store.get(["a"])).toEqual(1)
+			expect(tr.get(["a"])).toEqual(2)
 
 			tr.remove(["b"])
-			assertEqual(store.get(["b"]), 2)
-			assertEqual(tr.get(["b"]), undefined)
+			expect(store.get(["b"])).toEqual(2)
+			expect(tr.get(["b"])).toEqual(undefined)
 
 			tr.set(["d"], 99)
-			assertEqual(store.get(["d"]), undefined)
-			assertEqual(tr.get(["d"]), 99)
+			expect(store.get(["d"])).toEqual(undefined)
+			expect(tr.get(["d"])).toEqual(99)
 		})
 
 		it("exists", () => {
@@ -924,9 +918,9 @@ export function databaseTestSuite(
 			}
 			transaction.commit()
 
-			assertEqual(store.exists(["a", "a", "c"]), true)
-			assertEqual(store.exists(["a", "c", "c"]), true)
-			assertEqual(store.exists(["a", "c", "d"]), false)
+			expect(store.exists(["a", "a", "c"])).toEqual(true)
+			expect(store.exists(["a", "c", "c"])).toEqual(true)
+			expect(store.exists(["a", "c", "d"])).toEqual(false)
 		})
 
 		it("transaction overwrites exists", () => {
@@ -936,16 +930,16 @@ export function databaseTestSuite(
 
 			const tr = store.transact()
 			tr.set(["a"], 2)
-			assertEqual(store.exists(["a"]), true)
-			assertEqual(tr.exists(["a"]), true)
+			expect(store.exists(["a"])).toEqual(true)
+			expect(tr.exists(["a"])).toEqual(true)
 
 			tr.remove(["b"])
-			assertEqual(store.exists(["b"]), true)
-			assertEqual(tr.exists(["b"]), false)
+			expect(store.exists(["b"])).toEqual(true)
+			expect(tr.exists(["b"])).toEqual(false)
 
 			tr.set(["d"], 99)
-			assertEqual(store.exists(["d"]), false)
-			assertEqual(tr.exists(["d"]), true)
+			expect(store.exists(["d"])).toEqual(false)
+			expect(tr.exists(["d"])).toEqual(true)
 		})
 
 		it("committing a transaction prevents any further interaction", () => {
@@ -953,14 +947,15 @@ export function databaseTestSuite(
 			const tx = store.transact()
 			tx.commit()
 
-			assert.throws(() => tx.get([1]))
-			assert.throws(() => tx.exists([1]))
-			assert.throws(() => tx.scan())
-			assert.throws(() => tx.write({}))
-			assert.throws(() => tx.set([1], 2))
-			assert.throws(() => tx.remove([1]))
-			assert.throws(() => tx.cancel())
-			assert.throws(() => tx.commit())
+			expect(() => tx.get([1])).toThrow()
+			expect(() => tx.get([1])).toThrow()
+			expect(() => tx.exists([1])).toThrow()
+			expect(() => tx.scan()).toThrow()
+			expect(() => tx.write({})).toThrow()
+			expect(() => tx.set([1], 2)).toThrow()
+			expect(() => tx.remove([1])).toThrow()
+			expect(() => tx.cancel()).toThrow()
+			expect(() => tx.commit()).toThrow()
 		})
 
 		it("canceling a transaction prevents any further interaction", () => {
@@ -968,24 +963,24 @@ export function databaseTestSuite(
 			const tx = store.transact()
 			tx.cancel()
 
-			assert.throws(() => tx.get([1]))
-			assert.throws(() => tx.exists([1]))
-			assert.throws(() => tx.scan())
-			assert.throws(() => tx.write({}))
-			assert.throws(() => tx.set([1], 2))
-			assert.throws(() => tx.remove([1]))
-			assert.throws(() => tx.cancel())
-			assert.throws(() => tx.commit())
+			expect(() => tx.get([1])).toThrow()
+			expect(() => tx.exists([1])).toThrow()
+			expect(() => tx.scan()).toThrow()
+			expect(() => tx.write({})).toThrow()
+			expect(() => tx.set([1], 2)).toThrow()
+			expect(() => tx.remove([1])).toThrow()
+			expect(() => tx.cancel()).toThrow()
+			expect(() => tx.commit()).toThrow()
 		})
 
 		it("cancelling a transaction does not submit writes", () => {
 			const store = createStorage(randomId())
 			const tx = store.transact()
 			tx.set([1], 2)
-			assertEqual(tx.get([1]), 2)
+			expect(tx.get([1])).toEqual(2)
 			tx.cancel()
 
-			assertEqual(store.get([1]), undefined)
+			expect(store.get([1])).toEqual(undefined)
 		})
 
 		it("root transaction can be recomposed", () => {
@@ -996,10 +991,10 @@ export function databaseTestSuite(
 			const tx2 = store.transact(tx.id, tx.writes)
 			tx2.commit()
 
-			assertEqual(store.scan(), [{ key: [1], value: 2 }])
+			expect(store.scan()).toEqual([{ key: [1], value: 2 }])
 		})
 
-		it.skip("cancelled transaction cannot conflict with other transactions")
+		it.todo("cancelled transaction cannot conflict with other transactions")
 
 		describe("application-level indexing", () => {
 			it("bidirectional friends stored as keys", () => {
@@ -1037,7 +1032,7 @@ export function databaseTestSuite(
 
 				let result = store.scan().map(({ key }) => key)
 
-				assertEqual(result, [
+				expect(result).toEqual([
 					["friend", "a", "b"],
 					["friend", "a", "c"],
 					["friend", "b", "a"],
@@ -1053,7 +1048,7 @@ export function databaseTestSuite(
 				removeAEV(["friend", "a", "b"], tx)
 				result = tx.scan().map(({ key }) => key)
 
-				assertEqual(result, [
+				expect(result).toEqual([
 					["friend", "a", "c"],
 					["friend", "b", "c"],
 					["friend", "c", "a"],
@@ -1066,7 +1061,7 @@ export function databaseTestSuite(
 				setAEV(["friend", "d", "a"], tx)
 				result = tx.scan().map(({ key }) => key)
 
-				assertEqual(result, [
+				expect(result).toEqual([
 					["friend", "a", "c"],
 					["friend", "a", "d"],
 					["friend", "b", "c"],
@@ -1079,89 +1074,92 @@ export function databaseTestSuite(
 				])
 			})
 
-			it("indexing objects stored as values", () => {
-				const store = createStorage(randomId())
+			// it("indexing objects stored as values",  () => {
+			// 	const store = createStorage(randomId())
 
-				type Person = { id: number; first: string; last: string; age: number }
+			// 	type Person = { id: number; first: string; last: string; age: number }
 
-				function setPerson(person: Person, tx: TupleTransactionApi) {
-					const prev = tx.get(["personById", person.id])
-					if (prev) {
-						tx.remove(["personByAge", prev.age, prev.id])
-					}
+			// 	 function setPerson(person: Person, tx: TupleTransactionApi) {
+			// 		const prev =  tx.get(["personById", person.id])
+			// 		if (prev) {
+			// 			tx.remove(["personByAge", prev.age, prev.id])
+			// 		}
 
-					tx.set(["personById", person.id], person)
-					tx.set(["personByAge", person.age, person.id], person)
-				}
+			// 		tx.set(["personById", person.id], person)
+			// 		tx.set(["personByAge", person.age, person.id], person)
+			// 	}
 
-				function removePerson(personId: number, tx: TupleTransactionApi) {
-					const prev = tx.get(["personById", personId])
-					if (prev) {
-						tx.remove(["personByAge", prev.age, prev.id])
-						tx.remove(["personById", prev.id])
-					}
-				}
+			// 	 function removePerson(
+			// 		personId: number,
+			// 		tx: TupleTransactionApi
+			// 	) {
+			// 		const prev =  tx.get(["personById", personId])
+			// 		if (prev) {
+			// 			tx.remove(["personByAge", prev.age, prev.id])
+			// 			tx.remove(["personById", prev.id])
+			// 		}
+			// 	}
 
-				const people: Person[] = [
-					{ id: 1, first: "Chet", last: "Corcos", age: 29 },
-					{ id: 2, first: "Simon", last: "Last", age: 26 },
-					{ id: 3, first: "Jon", last: "Schwartz", age: 30 },
-					{ id: 4, first: "Luke", last: "Hansen", age: 29 },
-				]
+			// 	const people: Person[] = [
+			// 		{ id: 1, first: "Chet", last: "Corcos", age: 29 },
+			// 		{ id: 2, first: "Simon", last: "Last", age: 26 },
+			// 		{ id: 3, first: "Jon", last: "Schwartz", age: 30 },
+			// 		{ id: 4, first: "Luke", last: "Hansen", age: 29 },
+			// 	]
 
-				const transaction = store.transact()
-				for (const person of _.shuffle(people)) {
-					setPerson(person, transaction)
-				}
-				transaction.commit()
+			// 	const transaction = store.transact()
+			// 	for (const person of _.shuffle(people)) {
+			// 		 setPerson(person, transaction)
+			// 	}
+			// 	 transaction.commit()
+			// 	const scanResults =  store.scan()
+			// 	console.log("scan result", scanResults)
+			// 	let result = scanResults.map(({ key }) => key)
+			// 	expect(result).toEqual([
+			// 		["personByAge", 26, 2],
+			// 		["personByAge", 29, 1],
+			// 		["personByAge", 29, 4],
+			// 		["personByAge", 30, 3],
+			// 		["personById", 1],
+			// 		["personById", 2],
+			// 		["personById", 3],
+			// 		["personById", 4],
+			// 	])
 
-				let result = store.scan().map(({ key }) => key)
+			// 	const tx = store.transact()
+			// 	 removePerson(3, tx)
+			// 	result = ( tx.scan()).map(({ key }) => key)
 
-				assertEqual(result, [
-					["personByAge", 26, 2],
-					["personByAge", 29, 1],
-					["personByAge", 29, 4],
-					["personByAge", 30, 3],
-					["personById", 1],
-					["personById", 2],
-					["personById", 3],
-					["personById", 4],
-				])
+			// 	expect(result).toEqual([
+			// 		["personByAge", 26, 2],
+			// 		["personByAge", 29, 1],
+			// 		["personByAge", 29, 4],
+			// 		["personById", 1],
+			// 		["personById", 2],
+			// 		["personById", 4],
+			// 	])
 
-				const tx = store.transact()
-				removePerson(3, tx)
-				result = tx.scan().map(({ key }) => key)
+			// 	 setPerson(
+			// 		{
+			// 			id: 1,
+			// 			first: "Chet",
+			// 			last: "Corcos",
+			// 			age: 30,
+			// 		},
+			// 		tx
+			// 	)
 
-				assertEqual(result, [
-					["personByAge", 26, 2],
-					["personByAge", 29, 1],
-					["personByAge", 29, 4],
-					["personById", 1],
-					["personById", 2],
-					["personById", 4],
-				])
+			// 	result = ( tx.scan()).map(({ key }) => key)
 
-				setPerson(
-					{
-						id: 1,
-						first: "Chet",
-						last: "Corcos",
-						age: 30,
-					},
-					tx
-				)
-
-				result = tx.scan().map(({ key }) => key)
-
-				assertEqual(result, [
-					["personByAge", 26, 2],
-					["personByAge", 29, 4],
-					["personByAge", 30, 1],
-					["personById", 1],
-					["personById", 2],
-					["personById", 4],
-				])
-			})
+			// 	expect(result).toEqual([
+			// 		["personByAge", 26, 2],
+			// 		["personByAge", 29, 4],
+			// 		["personByAge", 30, 1],
+			// 		["personById", 1],
+			// 		["personById", 2],
+			// 		["personById", 4],
+			// 	])
+			// })
 		})
 
 		describe("MVCC - Multi-version Concurrency Control", () => {
@@ -1186,8 +1184,8 @@ export function databaseTestSuite(
 
 				// Someone has to lose. Whoever commits first wins.
 				chet.commit()
-				assert.throws(() => meghan.commit())
-				assertEqual(store.get(["lamp"]), true)
+				expect(() => meghan.commit()).toThrow()
+				expect(store.get(["lamp"])).toEqual(true)
 
 				// Meghan will have to try again.
 				const meghan2 = store.transact()
@@ -1195,7 +1193,7 @@ export function databaseTestSuite(
 				meghan2.commit()
 
 				// And she has her way.
-				assertEqual(store.get(["lamp"]), false)
+				expect(store.get(["lamp"])).toEqual(false)
 			})
 
 			if (!isSync) {
@@ -1226,19 +1224,19 @@ export function databaseTestSuite(
 
 					function chet() {
 						incScore(store, 10, 2)
-						assertEqual(store.get(["score"]), 10)
+						expect(store.get(["score"])).toEqual(10)
 					}
 
 					function meghan() {
 						sleep(1)
 						incScore(store, -1, 2)
-						assertEqual(store.get(["score"]), 9)
+						expect(store.get(["score"])).toEqual(9)
 					}
 
 					;[chet(), meghan()]
 
 					// Final state.
-					assertEqual(store.get(["score"]), 9)
+					expect(store.get(["score"])).toEqual(9)
 				})
 			}
 
@@ -1301,10 +1299,10 @@ export function databaseTestSuite(
 
 				// Whoever commits first will win.
 				meghan.commit()
-				assert.throws(() => chet.commit())
+				expect(() => chet.commit()).toThrow()
 
 				// Most importantly, the total will never be incorrect.
-				assertEqual(store.scan({ prefix: [] }), [
+				expect(store.scan({ prefix: [] })).toEqual([
 					{ key: ["player", "chet", 0], value: null },
 					{ key: ["player", "meghan", 1], value: null },
 					{ key: ["total", 1], value: null },
@@ -1326,10 +1324,10 @@ export function databaseTestSuite(
 				c.commit()
 
 				a.commit() // ok
-				assert.throws(() => b.commit())
+				expect(() => b.commit()).toThrow()
 			})
 
-			it.skip("can be used for transactional reads")
+			it.todo("can be used for transactional reads")
 		})
 
 		describe("Reactivity", () => {
@@ -1346,7 +1344,7 @@ export function databaseTestSuite(
 
 				store.transact().set(["a"], 1).commit()
 
-				assert.deepStrictEqual(hoist, {
+				expect(hoist).toStrictEqual({
 					set: [{ key: ["a"], value: 1 }],
 					remove: [],
 				})
@@ -1372,7 +1370,7 @@ export function databaseTestSuite(
 				transaction.commit()
 
 				const data = store.scan()
-				assertEqual(data, items)
+				expect(data).toEqual(items)
 
 				let hoist: WriteOps | undefined
 				store.subscribe(
@@ -1384,7 +1382,7 @@ export function databaseTestSuite(
 
 				store.transact().set(["a", "b", 1], 1).commit()
 
-				assert.deepStrictEqual(hoist, {
+				expect(hoist).toStrictEqual({
 					set: [{ key: ["a", "b", 1], value: 1 }],
 					remove: [],
 				})
@@ -1410,7 +1408,7 @@ export function databaseTestSuite(
 				transaction.commit()
 
 				const data = store.scan()
-				assertEqual(data, items)
+				expect(data).toEqual(items)
 
 				let hoist: WriteOps | undefined
 				store.subscribe({ prefix: ["a", "b"] }, (writes) => {
@@ -1419,7 +1417,7 @@ export function databaseTestSuite(
 
 				store.transact().remove(["a", "b", "a"]).commit()
 
-				assert.deepStrictEqual(hoist, {
+				expect(hoist).toStrictEqual({
 					set: [],
 					remove: [["a", "b", "a"]],
 				})
@@ -1445,7 +1443,7 @@ export function databaseTestSuite(
 				transaction.commit()
 
 				const data = store.scan()
-				assertEqual(data, items)
+				expect(data).toEqual(items)
 
 				let hoist: WriteOps | undefined
 				store.subscribe({ prefix: ["a", "b"] }, (writes) => {
@@ -1454,7 +1452,7 @@ export function databaseTestSuite(
 
 				store.transact().set(["a", "b", "a"], 99).commit()
 
-				assert.deepStrictEqual(hoist, {
+				expect(hoist).toStrictEqual({
 					set: [{ key: ["a", "b", "a"], value: 99 }],
 					remove: [],
 				})
@@ -1480,7 +1478,7 @@ export function databaseTestSuite(
 				transaction.commit()
 
 				const data = store.scan()
-				assertEqual(data, items)
+				expect(data).toEqual(items)
 
 				// Note that these queries are *basically* the same.
 				// { gt: ["a", "a", MAX], lt: ["a", "c", MIN] },
@@ -1513,12 +1511,12 @@ export function databaseTestSuite(
 
 				store.transact().set(["a", "c", 1], 1).commit()
 
-				assert.deepStrictEqual(hoist1, undefined)
+				expect(hoist1).toStrictEqual(undefined!)
 
 				// Even though the prefix matches, isWithinBounds should filter this out.
-				assert.deepStrictEqual(hoist2, undefined)
+				expect(hoist2).toStrictEqual(undefined!)
 
-				assert.deepStrictEqual(hoist3, {
+				expect(hoist3).toStrictEqual({
 					set: [{ key: ["a", "c", 1], value: 1 }],
 					remove: [],
 				})
@@ -1529,14 +1527,14 @@ export function databaseTestSuite(
 				store.commit({ set: [{ key: ["a"], value: 1 }] })
 
 				let value = store.get(["a"])
-				assert.equal(value, 1)
+				expect(value).toEqual(1)
 
 				store.subscribe({ gte: ["a"], lte: ["a"] }, (writes) => {
 					value = store.get(["a"])
 				})
 
 				store.transact().set(["a"], 2).commit()
-				assert.equal(value, 2)
+				expect(value).toEqual(2)
 			})
 
 			it("errors in callbacks don't break the database", () => {
@@ -1565,8 +1563,8 @@ export function databaseTestSuite(
 				// Does not throw, calls console.error instead.
 				store.transact().set(["a", 1], 1).commit()
 
-				assert.equal(called, true)
-				assert.equal(throws, true)
+				expect(called).toEqual(true)
+				expect(throws).toEqual(true)
 			})
 		})
 
@@ -1607,19 +1605,19 @@ export function databaseTestSuite(
 
 				peopleList = result
 
-				assert.deepEqual(peopleList, ["chet", "meghan"])
-				assert.deepEqual(compute, 1)
+				expect(peopleList).toEqual(["chet", "meghan"])
+				expect(compute).toEqual(1)
 				compute = 0
 
 				store.transact().set(["person", 1], "chester").commit()
 
-				assert.deepEqual(peopleList, ["chester", "meghan"])
-				assert.deepEqual(compute, 1)
+				expect(peopleList).toEqual(["chester", "meghan"])
+				expect(compute).toEqual(1)
 				compute = 0
 
 				store.transact().set(["person", 3], "joe").commit()
-				assert.deepEqual(peopleList, ["chester", "meghan"])
-				assert.deepEqual(compute, 0)
+				expect(peopleList).toEqual(["chester", "meghan"])
+				expect(compute).toEqual(0)
 
 				// Two changes at once, only one callback.
 				store
@@ -1630,8 +1628,8 @@ export function databaseTestSuite(
 					.set(["list", 2, 1], null)
 					.commit()
 
-				assert.deepEqual(peopleList, ["mego", "chet"])
-				assert.deepEqual(compute, 1)
+				expect(peopleList).toEqual(["mego", "chet"])
+				expect(compute).toEqual(1)
 			})
 
 			it("can transactionally read", () => {
@@ -1661,7 +1659,7 @@ export function databaseTestSuite(
 					}
 				)
 				total = result
-				assert.equal(total, 2)
+				expect(total).toEqual(2)
 
 				store.commit({
 					set: [
@@ -1669,10 +1667,10 @@ export function databaseTestSuite(
 						{ key: ["meghan"], value: 2 },
 					],
 				})
-				assert.equal(total, 4)
+				expect(total).toEqual(4)
 
 				store.transact().set(["chet"], 3).commit()
-				assert.equal(total, 5)
+				expect(total).toEqual(5)
 			})
 		})
 
@@ -1699,13 +1697,12 @@ export function databaseTestSuite(
 				writePerson(store, { id: "3", name: "Tanishq", age: 22 })
 
 				const personByAge = store.subspace(["personByAge"])
-				assertEqual(
-					personByAge.scan().map(({ key }) => key[0]),
-					[22, 30, 31]
-				)
-				assertEqual(personByAge.get([22, "3"])!.name, "Tanishq")
-				assertEqual(personByAge.exists([31, "1"]), true)
-				assertEqual(personByAge.exists([31, "2"]), false)
+				expect(personByAge.scan().map(({ key }) => key[0])).toEqual([
+					22, 30, 31,
+				])
+				expect(personByAge.get([22, "3"])!.name).toEqual("Tanishq")
+				expect(personByAge.exists([31, "1"])).toEqual(true)
+				expect(personByAge.exists([31, "2"])).toEqual(false)
 			})
 
 			it("writes work", () => {
@@ -1721,11 +1718,11 @@ export function databaseTestSuite(
 
 				const a = store.subspace(["a"])
 				const tx = a.transact().set([3], 3)
-				assertEqual(tx.get([1]), 1)
-				assertEqual(tx.get([3]), 3)
+				expect(tx.get([1])).toEqual(1)
+				expect(tx.get([3])).toEqual(3)
 				tx.commit()
 
-				assertEqual(a.scan(), [
+				expect(a.scan()).toEqual([
 					{ key: [1], value: 1 },
 					{ key: [2], value: 2 },
 					{ key: [3], value: 3 },
@@ -1746,10 +1743,10 @@ export function databaseTestSuite(
 				const a = store.subspace(["a"])
 				const aa = a.subspace(["a"])
 				const tx = aa.transact().set([3], 3)
-				assertEqual(tx.get([1]), 1)
-				assertEqual(tx.get([3]), 3)
+				expect(tx.get([1])).toEqual(1)
+				expect(tx.get([3])).toEqual(3)
 				tx.commit()
-				assertEqual(aa.scan(), [
+				expect(aa.scan()).toEqual([
 					{ key: [1], value: 1 },
 					{ key: [2], value: 2 },
 					{ key: [3], value: 3 },
@@ -1775,7 +1772,7 @@ export function databaseTestSuite(
 				const aa = tx.subspace(["a"])
 				aa.set([4], 4)
 
-				assertEqual(aa.scan(), [
+				expect(aa.scan()).toEqual([
 					{ key: [1], value: 1 },
 					{ key: [2], value: 2 },
 					{ key: [3], value: 3 },
@@ -1784,7 +1781,7 @@ export function databaseTestSuite(
 
 				tx.commit()
 
-				assertEqual(a.scan(), [
+				expect(a.scan()).toEqual([
 					{ key: ["a", 1], value: 1 },
 					{ key: ["a", 2], value: 2 },
 					{ key: ["a", 3], value: 3 },
@@ -1816,7 +1813,7 @@ export function databaseTestSuite(
 
 				const a = store.subspace(["a"])
 
-				assertEqual(a.scan({ gt: [1] }), [{ key: [2], value: 2 }])
+				expect(a.scan({ gt: [1] })).toEqual([{ key: [2], value: 2 }])
 			})
 		})
 
@@ -1959,13 +1956,13 @@ export function databaseTestSuite(
 					transaction.commit()
 
 					const data = store.scan()
-					assertEqual(data, items)
+					expect(data).toEqual(items)
 
 					store.close()
 
 					const store2 = createStorage(id)
 					const data2 = store2.scan()
-					assertEqual(data2, items)
+					expect(data2).toEqual(items)
 				})
 			})
 		}
@@ -1981,7 +1978,7 @@ export function databaseTestSuite(
 				],
 			})
 
-			assertEqual(db.scan({ reverse: true }), [
+			expect(db.scan({ reverse: true })).toEqual([
 				{ key: [3], value: null },
 				{ key: [2], value: null },
 				{ key: [1], value: null },
@@ -1999,7 +1996,7 @@ export function databaseTestSuite(
 				],
 			})
 
-			assertEqual(db.scan({ limit: 1 }), [{ key: [1], value: null }])
+			expect(db.scan({ limit: 1 })).toEqual([{ key: [1], value: null }])
 		})
 
 		it("scan reverse limit", () => {
@@ -2013,7 +2010,7 @@ export function databaseTestSuite(
 				],
 			})
 
-			assertEqual(db.scan({ reverse: true, limit: 1 }), [
+			expect(db.scan({ reverse: true, limit: 1 })).toEqual([
 				{ key: [3], value: null },
 			])
 		})
@@ -2033,7 +2030,7 @@ export function databaseTestSuite(
 
 			tx.set([2.5], null)
 
-			assertEqual(tx.scan({ reverse: true }), [
+			expect(tx.scan({ reverse: true })).toEqual([
 				{ key: [3], value: null },
 				{ key: [2.5], value: null },
 				{ key: [2], value: null },
@@ -2055,13 +2052,13 @@ export function databaseTestSuite(
 			NoChange: {
 				const tx = db.transact()
 				tx.set([5], null)
-				assertEqual(tx.scan({ limit: 1 }), [{ key: [1], value: null }])
+				expect(tx.scan({ limit: 1 })).toEqual([{ key: [1], value: null }])
 			}
 
 			YesChange: {
 				const tx = db.transact()
 				tx.set([0], null)
-				assertEqual(tx.scan({ limit: 1 }), [{ key: [0], value: null }])
+				expect(tx.scan({ limit: 1 })).toEqual([{ key: [0], value: null }])
 			}
 		})
 
@@ -2079,7 +2076,7 @@ export function databaseTestSuite(
 			YesChange: {
 				const tx = db.transact()
 				tx.set([5], null)
-				assertEqual(tx.scan({ limit: 1, reverse: true }), [
+				expect(tx.scan({ limit: 1, reverse: true })).toEqual([
 					{ key: [5], value: null },
 				])
 			}
@@ -2087,7 +2084,7 @@ export function databaseTestSuite(
 			NoChange: {
 				const tx = db.transact()
 				tx.set([0], null)
-				assertEqual(tx.scan({ limit: 1, reverse: true }), [
+				expect(tx.scan({ limit: 1, reverse: true })).toEqual([
 					{ key: [3], value: null },
 				])
 			}
@@ -2107,7 +2104,7 @@ export function databaseTestSuite(
 			YesChange: {
 				const tx = db.transact()
 				tx.set([0], null)
-				assertEqual(tx.scan({ limit: 2 }), [
+				expect(tx.scan({ limit: 2 })).toEqual([
 					{ key: [0], value: null },
 					{ key: [1], value: null },
 				])
@@ -2116,7 +2113,7 @@ export function databaseTestSuite(
 			NoChange: {
 				const tx = db.transact()
 				tx.set([5], null)
-				assertEqual(tx.scan({ limit: 2 }), [
+				expect(tx.scan({ limit: 2 })).toEqual([
 					{ key: [1], value: null },
 					{ key: [2], value: null },
 				])

@@ -1,4 +1,4 @@
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { InMemoryTupleStorage } from "../../main"
 import { TupleDatabase } from "./TupleDatabase"
 import { TupleDatabaseClient } from "./TupleDatabaseClient"

@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { TupleDatabase } from "../database/sync/TupleDatabase"
 import { TupleDatabaseClient } from "../database/sync/TupleDatabaseClient"
 import { InMemoryTupleStorage } from "../storage/InMemoryTupleStorage"
@@ -31,17 +30,16 @@ describe("Triplestore", () => {
 			writeFact(db, fact)
 		}
 
-		assert.deepEqual(
+		expect(
 			evaluateQuery(db, [
 				[$("chetId"), "name", "chet"],
 				[$("id"), "worksFor", $("chetId")],
 				[$("id"), "name", $("name")],
-			]),
-			[
-				{ name: "tk", id: "2", chetId: "1" },
-				{ name: "joe", id: "3", chetId: "1" },
-			]
-		)
+			])
+		).toEqual([
+			{ name: "tk", id: "2", chetId: "1" },
+			{ name: "joe", id: "3", chetId: "1" },
+		])
 	})
 
 	it("family example", () => {
@@ -78,7 +76,7 @@ describe("Triplestore", () => {
 			[$("cousin"), "parent", $("auntOrUncle")],
 		])
 
-		assert.deepEqual(result, [
+		expect(result).toEqual([
 			{ cousin: "Becca", auntOrUncle: "Melanie", parent: "Deborah" },
 			{ cousin: "Roni", auntOrUncle: "Melanie", parent: "Deborah" },
 			{ cousin: "Tim", auntOrUncle: "Melanie", parent: "Deborah" },

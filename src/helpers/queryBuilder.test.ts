@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { AsyncTupleDatabaseClient } from "../database/async/AsyncTupleDatabaseClient"
 import { TupleDatabase } from "../database/sync/TupleDatabase"
 import { TupleDatabaseClient } from "../database/sync/TupleDatabaseClient"
@@ -51,13 +50,11 @@ describe("queryBuilder", () => {
 			new TupleDatabase(new InMemoryTupleStorage())
 		)
 
-		assert.equal(execute(db, getNextOrder("chet", "color")), 0)
+		expect(execute(db, getNextOrder("chet", "color"))).toBe(0)
 		execute(db, appendTriple(["chet", "color", "red"]))
 
-		assert.equal(execute(db, getNextOrder("chet", "color")), 1)
+		expect(execute(db, getNextOrder("chet", "color"))).toBe(1)
 		execute(db, appendTriple(["chet", "color", "blue"]))
-
-		console.log("RESULT", db.scan())
 	})
 
 	it("works async", async () => {
@@ -65,12 +62,10 @@ describe("queryBuilder", () => {
 			DelayDb(new TupleDatabase(new InMemoryTupleStorage()), 10)
 		)
 
-		assert.equal(await execute(db, getNextOrder("chet", "color")), 0)
+		expect(await execute(db, getNextOrder("chet", "color"))).toBe(0)
 		await execute(db, appendTriple(["chet", "color", "red"]))
 
-		assert.equal(await execute(db, getNextOrder("chet", "color")), 1)
+		expect(await execute(db, getNextOrder("chet", "color"))).toBe(1)
 		await execute(db, appendTriple(["chet", "color", "blue"]))
-
-		console.log("RESULT", await db.scan())
 	})
 })

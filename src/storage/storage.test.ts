@@ -12,9 +12,12 @@ import { InMemoryTupleStorage } from "./InMemoryTupleStorage"
 import { LevelTupleStorage } from "./LevelTupleStorage"
 import { CachedIndexedDbStorage } from "./IndexedDbWithMemoryCacheTupleStorage"
 import { MemoryBTreeStorage } from "./MemoryBTreeTupleStorage"
-// import { SQLiteTupleStorage } from "./SQLiteTupleStorage"
+import { LMDBTupleStorage } from "./LMDBTupleStorage"
+import * as LMDB from "lmdb"
+import { SQLiteTupleStorage } from "./SQLiteTupleStorage"
+import sqlite from "better-sqlite3"
 
-const tmpDir = path.resolve(__dirname, "/../../tmp")
+const tmpDir = path.resolve(__dirname, "./../../tmp")
 
 databaseTestSuite(
 	"TupleDatabaseClient(TupleDatabase(InMemoryTupleStorage))",
@@ -34,11 +37,30 @@ databaseTestSuite(
 // 	"TupleDatabaseClient(TupleDatabase(SQLiteTupleStorage))",
 // 	(id) =>
 // 		new TupleDatabaseClient(
-// 			new TupleDatabase(
-// 				new SQLiteTupleStorage(sqlite(path.join(tmpDir, id + ".db")))
-// 			)
+// 			new TupleDatabase(new SQLiteTupleStorage(sqlite(":memory:")))
 // 		)
 // )
+
+asyncDatabaseTestSuite(
+	"AsyncTupleDatabaseClient(TupleDatabase(LMDBTupleStorage))",
+	(id) => {
+		return new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(
+				new LMDBTupleStorage(
+					LMDB.open(path.join(tmpDir, `test-${id}.lmdb`), {
+						// sharedStructuresKey: Symbol.for("structures"),
+						encoding: "string",
+						// keyEncoding: "ordered-binary",
+						// dupSort: true,
+						// strictAsyncOrder: true,
+					})
+				)
+			)
+		)
+	},
+
+	true
+)
 
 asyncDatabaseTestSuite(
 	"AsyncTupleDatabaseClient(TupleDatabase(InMemoryTupleStorage))",

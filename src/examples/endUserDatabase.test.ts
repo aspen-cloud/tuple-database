@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { transactionalReadWrite } from "../database/sync/transactionalReadWrite"
 import { TupleDatabase } from "../database/sync/TupleDatabase"
 import { TupleDatabaseClient } from "../database/sync/TupleDatabaseClient"
@@ -41,20 +40,19 @@ function objectToFacts(obj: Obj) {
 
 describe("objectToFacts", () => {
 	it("works", () => {
-		assert.deepEqual(
+		expect(
 			objectToFacts({
 				id: "1",
 				name: "Chet",
 				age: 31,
 				tags: ["engineer", "musician"],
-			}),
-			[
-				["1", "age", 31],
-				["1", "name", "Chet"],
-				["1", "tags", "engineer"],
-				["1", "tags", "musician"],
-			]
-		)
+			})
+		).toEqual([
+			["1", "age", 31],
+			["1", "name", "Chet"],
+			["1", "tags", "engineer"],
+			["1", "tags", "musician"],
+		])
 	})
 })
 
@@ -178,11 +176,11 @@ describe("End-user Database", () => {
 
 		// Create a filter with only one property.
 		createFilter(db, { id: "filter1", tags: "engineer" })
-		assert.deepEqual(readFilterIndex(db, "filter1"), ["person1", "person2"])
+		expect(readFilterIndex(db, "filter1")).toEqual(["person1", "person2"])
 
 		// Test that this filter gets maintained.
 		writeObjectFact(db, ["person4", "tags", "engineer"])
-		assert.deepEqual(readFilterIndex(db, "filter1"), [
+		expect(readFilterIndex(db, "filter1")).toEqual([
 			"person1",
 			"person2",
 			"person4",
@@ -194,7 +192,7 @@ describe("End-user Database", () => {
 			tags: "musician",
 			age: 31,
 		})
-		assert.deepEqual(readFilterIndex(db, "filter2"), ["person1", "person3"])
+		expect(readFilterIndex(db, "filter2")).toEqual(["person1", "person3"])
 
 		// Test that this filter gets maintained.
 		writeObject(db, {
@@ -204,7 +202,7 @@ describe("End-user Database", () => {
 			tags: ["musician", "botanist"],
 		})
 
-		assert.deepEqual(readFilterIndex(db, "filter2"), [
+		expect(readFilterIndex(db, "filter2")).toEqual([
 			"person1",
 			"person3",
 			"person5",

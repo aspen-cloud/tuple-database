@@ -1,8 +1,7 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 
 describe("base", () => {
 	it("works", () => {
-		assert.ok(true)
+		expect(true).toBeTruthy()
 	})
 })

@@ -1,5 +1,4 @@
-import { strict as assert } from "assert"
-import { describe, it } from "mocha"
+import { describe, it, expect } from "bun:test"
 import { MaxTuple } from "./sortedTupleArray"
 import {
 	normalizeSubspaceScanArgs,
@@ -10,46 +9,44 @@ import {
 describe("subspaceHelpers", () => {
 	describe("prependPrefixToWrites", () => {
 		it("works", () => {
-			assert.deepEqual(
+			expect(
 				prependPrefixToWriteOps(["x"], {
 					set: [
 						{ key: ["a"], value: 1 },
 						{ key: ["b"], value: 2 },
 					],
 					remove: [["c"]],
-				}),
-				{
-					set: [
-						{ key: ["x", "a"], value: 1 },
-						{ key: ["x", "b"], value: 2 },
-					],
-					remove: [["x", "c"]],
-				}
-			)
+				})
+			).toEqual({
+				set: [
+					{ key: ["x", "a"], value: 1 },
+					{ key: ["x", "b"], value: 2 },
+				],
+				remove: [["x", "c"]],
+			})
 		})
 	})
 
 	describe("removePrefixFromWrites", () => {
 		it("works", () => {
-			assert.deepEqual(
+			expect(
 				removePrefixFromWriteOps(["x"], {
 					set: [
 						{ key: ["x", "a"], value: 1 },
 						{ key: ["x", "b"], value: 2 },
 					],
 					remove: [["x", "c"]],
-				}),
-				{
-					set: [
-						{ key: ["a"], value: 1 },
-						{ key: ["b"], value: 2 },
-					],
-					remove: [["c"]],
-				}
-			)
+				})
+			).toEqual({
+				set: [
+					{ key: ["a"], value: 1 },
+					{ key: ["b"], value: 2 },
+				],
+				remove: [["c"]],
+			})
 		})
 		it("throws if its the wrong prefix", () => {
-			assert.throws(() => {
+			expect(() => {
 				removePrefixFromWriteOps(["y"], {
 					set: [
 						{ key: ["x", "a"], value: 1 },
@@ -57,16 +54,16 @@ describe("subspaceHelpers", () => {
 					],
 					remove: [["x", "c"]],
 				})
-			})
+			}).toThrow()
 		})
 	})
 
 	describe("normalizeSubspaceScanArgs", () => {
 		it("works", () => {
-			assert.deepEqual(
-				normalizeSubspaceScanArgs([1], { prefix: [2], gt: [3] }),
-				{ gt: [1, 2, 3], lte: [1, 2, ...MaxTuple] }
-			)
+			expect(normalizeSubspaceScanArgs([1], { prefix: [2], gt: [3] })).toEqual({
+				gt: [1, 2, 3],
+				lte: [1, 2, ...MaxTuple],
+			})
 		})
 	})
 })
