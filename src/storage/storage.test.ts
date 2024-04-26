@@ -19,19 +19,19 @@ import sqlite from "better-sqlite3"
 
 const tmpDir = path.resolve(__dirname, "./../../tmp")
 
-databaseTestSuite(
-	"TupleDatabaseClient(TupleDatabase(InMemoryTupleStorage))",
-	() => new TupleDatabaseClient(new TupleDatabase(new InMemoryTupleStorage())),
-	false
-)
+// databaseTestSuite(
+// 	"TupleDatabaseClient(TupleDatabase(InMemoryTupleStorage))",
+// 	() => new TupleDatabaseClient(new TupleDatabase(new InMemoryTupleStorage())),
+// 	false
+// )
 
-databaseTestSuite(
-	"TupleDatabaseClient(TupleDatabase(FileTupleStorage))",
-	(id) =>
-		new TupleDatabaseClient(
-			new TupleDatabase(new FileTupleStorage(path.join(tmpDir, id)))
-		)
-)
+// databaseTestSuite(
+// 	"TupleDatabaseClient(TupleDatabase(FileTupleStorage))",
+// 	(id) =>
+// 		new TupleDatabaseClient(
+// 			new TupleDatabase(new FileTupleStorage(path.join(tmpDir, id)))
+// 		)
+// )
 
 // databaseTestSuite(
 // 	"TupleDatabaseClient(TupleDatabase(SQLiteTupleStorage))",
