@@ -176,8 +176,10 @@ async function main() {
 		"LMDB",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
-				new LMDBTupleStorage(
-					LMDB.open(path.join(tmpDir, "benchmark-lmdb-write.db"), {})
+				new LMDBTupleStorage((options) =>
+					LMDB.open(path.join(tmpDir, "benchmark-lmdb-write.db"), {
+						...options,
+					})
 				)
 			)
 		)
@@ -187,8 +189,8 @@ async function main() {
 		"LMDB",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
-				new LMDBTupleStorage(
-					LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), {})
+				new LMDBTupleStorage((options) =>
+					LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), { ...options })
 				)
 			)
 		)
@@ -225,8 +227,8 @@ async function main() {
 		"AsyncTupleDatabase(LMDBTupleStorage))",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
-				new LMDBTupleStorage(
-					LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), {})
+				new LMDBTupleStorage((options) =>
+					LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), { ...options })
 				)
 			)
 		)

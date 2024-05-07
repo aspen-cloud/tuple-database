@@ -46,10 +46,10 @@ asyncDatabaseTestSuite(
 	(id) => {
 		return new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
-				new LMDBTupleStorage(
+				new LMDBTupleStorage((options) =>
 					LMDB.open(path.join(tmpDir, `test-${id}.lmdb`), {
+						...options,
 						// sharedStructuresKey: Symbol.for("structures"),
-						encoding: "string",
 						// keyEncoding: "ordered-binary",
 						// dupSort: true,
 						// strictAsyncOrder: true,

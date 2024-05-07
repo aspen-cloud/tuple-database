@@ -1,4 +1,4 @@
-import * as LMDB from "lmdb"
+import type * as LMDB from "lmdb"
 import { AsyncTupleStorageApi } from "../database/async/asyncTypes"
 import {
 	decodeTuple,
@@ -6,15 +6,35 @@ import {
 	encodeTuple,
 	encodeValue,
 } from "../helpers/codec"
-import { KeyValuePair, MIN, ScanStorageArgs, WriteOps } from "./types"
+import { KeyValuePair, MIN, ScanStorageArgs, Tuple, WriteOps } from "./types"
+
+const MIN_TUPLE = encodeTuple([MIN])
 
 export class LMDBTupleStorage implements AsyncTupleStorageApi {
-	constructor(public db: LMDB.Database) {}
+	public db: LMDB.Database
+	constructor(dbFactory: (options: LMDB.RootDatabaseOptions) => LMDB.Database) {
+		const encoder = {
+			writeKey(key: string, targetBuffer: Buffer, startPosition: number) {
+				targetBuffer.write(key, startPosition, key.length, "utf8")
+				return startPosition + key.length
+			},
+			readKey(buffer: Buffer, startPosition: number, endPosition: number) {
+				return buffer.toString("utf8", startPosition, endPosition)
+			},
+		}
+		// This encoder should take our encoded tuples and write them directly to a buffer
+		// keyEncoder is used to encode keys when writing to the database, although its mentioned in docs, it is not in the types
+		// encoder (I think) encodes values, it is not mentioned in the docs however is properly typed
+		// TODO: test lmdb directly to determine why pre-encoded strings sometimes fail to encode properly with their default encoder
+		this.db = dbFactory({
+			// @ts-expect-error
+			keyEncoder: encoder,
+		})
+	}
 
 	async scan(args: ScanStorageArgs = {}): Promise<KeyValuePair[]> {
 		const startTuple = args.gt ?? args.gte
-		const start =
-			startTuple !== undefined ? encodeTuple(startTuple) : encodeTuple([MIN])
+		const start = startTuple !== undefined ? encodeTuple(startTuple) : MIN_TUPLE
 		const endTuple = args.lt ?? args.lte
 		const end = endTuple !== undefined ? encodeTuple(endTuple) : undefined
 		if (start && end) {
@@ -53,16 +73,9 @@ export class LMDBTupleStorage implements AsyncTupleStorageApi {
 				}
 				break
 			}
-			console.log(
-				"scan",
-				`key(${key as string})`,
-				`value(${value})`,
-				decodeTuple(key as string),
-				decodeValue(value)
-			)
 			results.push({
 				key: decodeTuple(key as string),
-				value: decodeValue(value),
+				value: value,
 			})
 			if (results.length >= (args?.limit ?? Infinity)) break
 		}
@@ -76,7 +89,7 @@ export class LMDBTupleStorage implements AsyncTupleStorageApi {
 			}
 			for (const { key, value } of writes.set ?? []) {
 				const storedKey = encodeTuple(key)
-				const storedValue = encodeValue(value)
+				const storedValue = value
 				this.db.put(storedKey, storedValue)
 			}
 		})
