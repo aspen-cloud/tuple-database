@@ -22,11 +22,17 @@ export class MemoryBTreeStorage implements TupleStorageApi {
 		const low = args?.gte ?? args?.gt ?? MIN
 		const high = args?.lte ?? args?.lt ?? MAX
 		const results: KeyValuePair[] = []
-		// TODO find way to reverse iterate so we can apply limit before reversing
+		// TODO use entries and entriesReversed instead?
 		this.btree.forRange(low, high, args?.lte != null, (key, value, n) => {
 			// if using gt (greater than) then skip equal keys
 			if (args?.gt && compareTuple(key, args.gt) === 0) return
 			results.push({ key, value })
+			if (
+				args?.reverse !== true &&
+				results.length >= (args?.limit ?? Infinity)
+			) {
+				return { break: true }
+			}
 		})
 
 		if (args?.reverse) results.reverse()
