@@ -160,6 +160,7 @@ const tmpDir = path.resolve(__dirname, "../../tmp")
 async function main() {
 	await fs.mkdirp(tmpDir)
 
+	// Memory
 	await asyncWriteOnlyBenchmark(
 		"Memory",
 		new AsyncTupleDatabaseClient(
@@ -172,7 +173,6 @@ async function main() {
 			new AsyncTupleDatabase(new InMemoryTupleStorage())
 		)
 	)
-
 	await asyncReadRemoveWriteBenchmark(
 		"Memory",
 		new AsyncTupleDatabaseClient(
@@ -180,8 +180,87 @@ async function main() {
 		)
 	)
 
+	// Memory BTree
 	await asyncWriteOnlyBenchmark(
-		"Memory Btree",
+		"Memory BTree",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new MemoryBTreeStorage())
+		)
+	)
+	await asyncReadPerformanceBenchmark(
+		"Memory BTree",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new MemoryBTreeStorage())
+		)
+	)
+	await asyncReadRemoveWriteBenchmark(
+		"Memory BTree",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(new MemoryBTreeStorage())
+		)
+	)
+
+	// LevelDB
+	// await asyncWriteOnlyBenchmark(
+	// 	"Level",
+	// 	new AsyncTupleDatabaseClient(
+	// 		new AsyncTupleDatabase(
+	// 			new LevelTupleStorage(
+	// 				new Level(path.join(tmpDir, "benchmark-level.db"))
+	// 			)
+	// 		)
+	// 	)
+	// )
+	// await asyncReadPerformanceBenchmark(
+	// 	"Level",
+	// 	new AsyncTupleDatabaseClient(
+	// 		new AsyncTupleDatabase(
+	// 			new LevelTupleStorage(
+	// 				new Level(path.join(tmpDir, "benchmark-level.db"))
+	// 			)
+	// 		)
+	// 	)
+	// )
+	// await asyncReadRemoveWriteBenchmark(
+	// 	"Level",
+	// 	new AsyncTupleDatabaseClient(
+	// 		new AsyncTupleDatabase(
+	// 			new LevelTupleStorage(
+	// 				new Level(path.join(tmpDir, "benchmark-level.db"))
+	// 			)
+	// 		)
+	// 	)
+	// )
+
+	// SQLite
+	await asyncWriteOnlyBenchmark(
+		"SQLite",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(
+				new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
+			)
+		)
+	)
+	await asyncReadPerformanceBenchmark(
+		"SQLite",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(
+				new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
+			)
+		)
+	)
+	await asyncReadRemoveWriteBenchmark(
+		"SQLite",
+		new AsyncTupleDatabaseClient(
+			new AsyncTupleDatabase(
+				new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
+			)
+		)
+	)
+
+	// LMDB
+	await asyncWriteOnlyBenchmark(
+		"LMDB",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
 				new LMDBTupleStorage((options) =>
@@ -193,7 +272,7 @@ async function main() {
 		)
 	)
 	await asyncReadPerformanceBenchmark(
-		"Memory BTree",
+		"LMDB",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
 				new LMDBTupleStorage((options) =>
@@ -202,58 +281,8 @@ async function main() {
 			)
 		)
 	)
-
 	await asyncReadRemoveWriteBenchmark(
-		"Memory BTree",
-		new AsyncTupleDatabaseClient(
-			new AsyncTupleDatabase(new MemoryBTreeStorage())
-		)
-	)
-
-	// await asyncWriteOnlyBenchmark(
-	// 	"LMDB",
-	// 	new AsyncTupleDatabaseClient(
-	// 		new AsyncTupleDatabase(
-	// 			new LMDBTupleStorage(
-	// 				LMDB.open(path.join(tmpDir, "benchmark-lmdb-write.db"), {})
-	// 			)
-	// 		)
-	// 	)
-	// )
-
-	// await asyncReadPerformanceBenchmark(
-	// 	"LMDB",
-	// 	new AsyncTupleDatabaseClient(
-	// 		new AsyncTupleDatabase(
-	// 			new LMDBTupleStorage(
-	// 				LMDB.open(path.join(tmpDir, "benchmark-lmdb.db"), {})
-	// 			)
-	// 		)
-	// 	)
-	// )
-
-	// await asyncReadRemoveWriteBenchmark(
-	// 	"AsyncTupleDatabase(SQLiteTupleStorage))",
-	// 	new AsyncTupleDatabaseClient(
-	// 		new AsyncTupleDatabase(
-	// 			new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
-	// 		)
-	// 	)
-	// )
-
-	// await asyncReadRemoveWriteBenchmark(
-	// 	"AsyncTupleDatabase(LevelTupleStorage))",
-	// 	new AsyncTupleDatabaseClient(
-	// 		new AsyncTupleDatabase(
-	// 			new LevelTupleStorage(
-	// 				new Level(path.join(tmpDir, "benchmark-level.db"))
-	// 			)
-	// 		)
-	// 	)
-	// )
-
-	await asyncReadRemoveWriteBenchmark(
-		"AsyncTupleDatabase(LMDBTupleStorage))",
+		"LMDB",
 		new AsyncTupleDatabaseClient(
 			new AsyncTupleDatabase(
 				new LMDBTupleStorage((options) =>
@@ -262,25 +291,6 @@ async function main() {
 			)
 		)
 	)
-
-	// await asyncReadPerformanceBenchmark(
-	// 	"READ(SQLite)",
-	// 	new AsyncTupleDatabaseClient(
-	// 		new AsyncTupleDatabase(
-	// 			new SQLiteTupleStorage(sqlite(path.join(tmpDir, "benchmark-sqlite.db")))
-	// 		)
-	// 	)
-	// )
-	// await asyncReadPerformanceBenchmark(
-	// 	"READ(Level)",
-	// 	new AsyncTupleDatabaseClient(
-	// 		new AsyncTupleDatabase(
-	// 			new LevelTupleStorage(
-	// 				new Level(path.join(tmpDir, "benchmark-level.db"))
-	// 			)
-	// 		)
-	// 	)
-	// )
 }
 
 main()
