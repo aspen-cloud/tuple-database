@@ -9,7 +9,7 @@ import {
 } from "./AdapterSQLiteStorage"
 import { AsyncTupleStorageApi } from "../database/async/asyncTypes"
 
-export class ExpoSQLiteLegacyTupleStorageApi implements AsyncTupleStorageApi {
+export class ExpoSQLiteLegacyTupleStorage implements AsyncTupleStorageApi {
 	private db: SQLite.SQLiteDatabase
 	private store: AsyncAdapterSQLiteStorage
 
