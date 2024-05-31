@@ -100,7 +100,7 @@ export class AdapterSQLiteStorage implements TupleStorageApi {
 	}
 }
 
-export class AsyncGenericSQLiteStorage implements AsyncTupleStorageApi {
+export class AsyncAdapterSQLiteStorage implements AsyncTupleStorageApi {
 	private options: RequiredAdapterSQLiteOptions
 	private dbReady: Promise<any>
 
