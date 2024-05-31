@@ -28,7 +28,6 @@
 		"@types/react": "^18.0.26",
 		"better-sqlite3": "^9.5.0",
 		"expo-sqlite": "^14.0.3",
-		"expo-sqlite-legacy": "npm:expo-sqlite@^13.0.0",
 		"fake-indexeddb": "^4.0.1",
 		"idb": "^7.1.1",
 		"level": "^8.0.0",

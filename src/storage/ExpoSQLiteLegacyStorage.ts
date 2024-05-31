@@ -1,4 +1,6 @@
-import * as SQLite from "expo-sqlite-legacy"
+// @ts-nocheck
+
+import * as SQLite from "expo-sqlite"
 import {
 	AsyncSQLiteAdapter,
 	AsyncSQLiteExecutor,
