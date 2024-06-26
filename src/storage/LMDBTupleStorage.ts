@@ -14,8 +14,18 @@ export class LMDBTupleStorage implements AsyncTupleStorageApi {
 	public db: LMDB.Database
 	constructor(dbFactory: (options: LMDB.RootDatabaseOptions) => LMDB.Database) {
 		const encoder = {
-			writeKey(key: string, targetBuffer: Buffer, startPosition: number) {
-				targetBuffer.write(key, startPosition, key.length, "utf8")
+			writeKey(
+				key: string | Buffer,
+				targetBuffer: Buffer,
+				startPosition: number
+			) {
+				// Sometimes key is buffer (i think for longer keys)
+				// TODO: add test
+				if (Buffer.isBuffer(key)) {
+					key.copy(targetBuffer, startPosition)
+				} else {
+					targetBuffer.write(key, startPosition, key.length, "utf8")
+				}
 				return startPosition + key.length
 			},
 			readKey(buffer: Buffer, startPosition: number, endPosition: number) {
