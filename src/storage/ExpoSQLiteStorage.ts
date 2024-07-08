@@ -49,8 +49,8 @@ class ExpoSQLiteAdapter implements AsyncSQLiteAdapter {
 		return await this.db.getAllAsync(sql, args ?? [])
 	}
 	normalizeResults(results: any): { key: string; value: string }[] {
-		if (!results.rows) return []
-		return results.rows as { key: string; value: string }[]
+		if (!results) return []
+		return results as { key: string; value: string }[]
 	}
 	async transact(fn: (adapter: AsyncSQLiteExecutor) => Promise<void>) {
 		await this.db.withTransactionAsync(async () => {
